@@ -8,18 +8,51 @@ RobinRun 是一个**全自动线上运营（非运维）Harness 系统**，基�
 - **项目制工作空间**（类似 Visual Studio）：启动程序先创建/选择项目，每个项目对应一个运营主体的独立工作空间，进入主界面后一个项目独占。
 - 主界面保持 ZCode 左中右布局：左侧=智能体列表（每个智能体下折叠其会话列表，点击会话切换）；中间=Agent 对话区；右侧=信息面板（网页预览、文件目录等，沿用 ZCode 实现）。界面样式参照 ZCode（`reference/ZCode/DESIGN.md`）。
 
-## 仓库布局
+## 仓库布局与项目结构
 
-- `reference/ZCode/`：ZCode 上游完整源码（v3.17.2，**只读参考基线，不要直接修改**）。根目录的 fork 已从这里复制并完成全量改名（ZCode→RobinRun，包名 `@robinrun/*`，目录 `apps/robinrun-cli`、`packages/robinrun-cua` 等）；根仓库 git remote `upstream` 指向 reference/ZCode，便于与上游对比/合并。
-- 数据根为 `~/.robinrun`（上游是 ~/.zcode），env 前缀 `ROBINRUN_*`；协议 deep link 为 `robinrun://`。上游 CDN/endpoint URL 值（cdn-zcode.z.ai、zcode.z.ai、bigmodel appId 等）**有意保留未改**，见改名提交说明。
+- `reference/ZCode/`：ZCode 上游完整源码（v3.17.2，**只读参考基线，不要直接修改**）。根目录 fork 已完成全量改名（ZCode→RobinRun）；git remote `upstream` 指向 reference/ZCode，便于对比/合并。
+- 数据根 `~/.robinrun`（上游 ~/.zcode），env 前缀 `ROBINRUN_*`，deep link `robinrun://`。上游 CDN/endpoint URL 值（cdn-zcode.z.ai、zcode.z.ai、bigmodel appId 等）**有意保留未改**。
+
+```
+apps/
+  robinrun-cli/        # Agent CLI 与运行时（packages/: core cli bootstrap adapters contracts tui i18n
+                       #   dynamic-workflow(-runtime) node-repl-host bundled-skills *-plugin …；docs/ 为上游历史文档）
+  dev-docs/            # 开发文档站
+packages/
+  desktop/             # Electron 桌面端：src/main（主进程，startupWorkspace 启动决策）、src/host（utility 进程服务注册）、
+                       #   src/preload、src/renderer、scripts/（desktop-product-identity.mjs 品牌单一身份源）
+  ui/                  # 共享 React 界面（主界面主体）：App.tsx → Root.tsx（启动分支/登录门禁/启动台挂载）→
+                       #   app-shell/WorkspaceShellLayout（左中右三栏）、project-sidebar/（侧栏视图，agents=任务组视图）、
+                       #   v4/（会话区）、robinrun/RobinRunLauncher.tsx（项目启动台）、i18n/、hooks/、store/
+  services/            # host 侧业务服务：setting/（setting.json 读写，AppSettings 注册表）、task-groups/（智能体分组存储）、
+                       #   project/（项目树）、file/、zcode-agent/(改名前的目录名，勿再改) 等
+  shared/              # 协议与类型：protocol.ts（AppSettings/RobinRunProjectEntry）、robinrun-protocol(-v4)/（会话协议）、
+                       #   validationAppSettings.ts（settings zod schema，与 protocol 有编译期形状守卫）
+  server/ + web/       # Web 端（服务端 + 客户端）
+  rpc/ client/ provider/ provider-node/ robinrun-cua/ robinrun-server-cli/ android/ share-ui/ …
+scripts/               # bootstrap.mjs（引导）、dev-desktop-env.mjs（dev:desktop 入口）、architecture/（架构检查）
+config/provider/       # 内置 provider 配置（robinrun-builtin.json，URL 值为上游服务）
+docs/ specs/           # 上游历史文档与 spec（保留原名，未改名；新设计文档另起）
+.agents/skills/        # 工作区技能（上游自带）
+```
+
 - 每个运营项目内，智能体的状态文件统一放 `.agents/`：每个智能体有自己的子文件夹，存放临时文件与状态文件（agents.md、经验、规则、记忆、进度等）。所有智能体对整个项目有查看/编辑权限。**注意**：渲染端目前没有任意路径写文件的 API，`.agents/` 物理脚手架暂缓，由智能体运行时自建。
 
-## 当前进度（P1 已落地，2026-11）
+## 当前进度与里程碑
+
+**已完成（P1 初始里程碑，2026-11-10）**，提交线：`a98ebec8` 基线导入 → `ac401f29` 全量改名 → `a7adc17f` 项目启动台 → `056ad37d` 智能体侧栏 → `731a5835`/`6fb78c08` 文档与登录门禁移除：
 
 - 基线可运行：`pnpm install`/`bootstrap`/`typecheck`/`dev:desktop` 全部通过。
-- 项目启动台（launcher）：冷启动必进启动台（`packages/desktop/src/main/startupWorkspace.ts` launcher 模式 + `packages/ui/src/robinrun/RobinRunLauncher.tsx`）；项目注册表持久化在 `robinrunProjects`（settings schema + protocol.ts 有编译期形状守卫）。
-- 智能体侧栏：左侧栏默认"智能体"视图 = 复用任务组（TaskGroup）承载智能体（M1 映射），智能体下折叠会话列表；文案已智能体化（taskGroup.* zh/en）。
-- 未落地（按里程碑推进）：常驻多智能体运行时、触发器、审核流程、任务系统 UI、会议、邮件、后端。
+- 启动流程：冷启动 → 项目启动台（跳过登录门禁与自动工作区恢复）→ 创建/选择项目 → 项目独占主界面。项目注册表在 `robinrunProjects`（settings schema + protocol 双处，编译期形状守卫）。
+- 智能体侧栏：左侧栏默认"智能体"视图 = 任务组（TaskGroup）承载智能体（M1 映射），智能体下折叠会话列表；新建/重命名/颜色/拖拽复用任务组基建。
+- 登录流程已隐藏（启动不再强制连接 Z.ai/BigModel；手动登录入口与 `setLoginEntryOpen` 门禁接入点保留，供未来自有账号体系使用）。
+
+**已知待改（下一里程碑优先）**：
+
+- **会话结构重构**：当前会话/任务数据结构有结构性问题（用户验收反馈），需要重新设计后再接多智能体运行时。
+- 智能体 = 任务组仅为 M1 映射；提示词/角色元数据待落 `.agents/<id>/`（需先设计 host 侧窄写入通道）。
+
+**未落地（按里程碑推进）**：常驻多智能体运行时（robinrun-cli subagent 体系扩展）、触发器系统、审核流程、任务系统 UI、`.agents/` 脚手架通道、会议、邮件、后端。
 
 ## 前后端划分
 
