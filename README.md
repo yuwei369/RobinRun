@@ -41,4 +41,9 @@ pnpm lint          # 代码检查
 
 ## License
 
-[Apache-2.0](LICENSE)（沿用上游 ZCode 许可，第三方组件声明见 [NOTICE.md](NOTICE.md) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)）。
+双许可：
+
+- **RobinRun 新增代码与文档**：[MIT](LICENSE-MIT)
+- **源自上游 ZCode 的代码**：[Apache-2.0](LICENSE)（其法律授权不可更改）
+
+第三方组件声明见 [NOTICE.md](NOTICE.md) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

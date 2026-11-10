@@ -149,6 +149,7 @@ monorepo 结构（已改名）：`packages/desktop`（Electron main/host/rendere
 - **grep 不可靠**：PATH 中 Anaconda 的 grep 行为异常；文本处理一律用绝对路径 `D:/Github/Git/usr/bin/grep.exe` 或 `git grep`。
 - commit message 用 ASCII（em-dash 会触发 bash 包装脚本故障）。
 - **GitHub 访问**：HTTPS 直连被墙，走 SSH-over-443（`~/.ssh/config` 里 Host github.com → ssh.github.com:443，专用密钥 `~/.ssh/id_ed25519_github`，无口令）；remote origin 即 `git@github.com:yuwei369/RobinRun.git`。pre-push 钩子已中性化（fork 决策），门禁靠提交前手动 typecheck/lint。
+- **许可**：双许可——fork 后新增原创代码用 MIT（LICENSE-MIT），上游 ZCode 派生代码保持 Apache-2.0（LICENSE，法律上不可改）。新文件勿写单独的许可头，以仓库级许可为准。
 
 ## 架构与编码约定（沿用上游，修改后仍需遵守）
 

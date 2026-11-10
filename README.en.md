@@ -41,4 +41,9 @@ See [AGENTS.md](AGENTS.md) for repository structure, architecture rules, and col
 
 ## License
 
-[Apache-2.0](LICENSE) (inherited from upstream ZCode; third-party notices in [NOTICE.md](NOTICE.md) and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)).
+Dual licensing:
+
+- **RobinRun's original additions**: [MIT](LICENSE-MIT)
+- **Code derived from upstream ZCode**: [Apache-2.0](LICENSE) (its legal grant cannot be changed)
+
+Third-party notices: [NOTICE.md](NOTICE.md) and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
