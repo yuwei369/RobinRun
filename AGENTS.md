@@ -148,6 +148,7 @@ monorepo 结构（已改名）：`packages/desktop`（Electron main/host/rendere
 - **tar 必须用 bsdtar**：GNU tar 把 `E:/...` 当远程主机。`export PATH="/c/Windows/System32:$PATH"` 让 System32 的 bsdtar 优先（prepare-runtime-assets 依赖此）。
 - **grep 不可靠**：PATH 中 Anaconda 的 grep 行为异常；文本处理一律用绝对路径 `D:/Github/Git/usr/bin/grep.exe` 或 `git grep`。
 - commit message 用 ASCII（em-dash 会触发 bash 包装脚本故障）。
+- **GitHub 访问**：HTTPS 直连被墙，走 SSH-over-443（`~/.ssh/config` 里 Host github.com → ssh.github.com:443，专用密钥 `~/.ssh/id_ed25519_github`，无口令）；remote origin 即 `git@github.com:yuwei369/RobinRun.git`。pre-push 钩子已中性化（fork 决策），门禁靠提交前手动 typecheck/lint。
 
 ## 架构与编码约定（沿用上游，修改后仍需遵守）
 
