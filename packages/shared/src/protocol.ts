@@ -254,6 +254,20 @@ export interface ResourceUsageSnapshot {
   processes: ResourceUsageProcess[];
 }
 
+/**
+ * RobinRun 运营项目登记条目：launcher（项目启动台）的注册表单元。
+ * path 是项目工作空间目录（也是本地 workspace identity 键）。
+ * 运行时校验 schema 见 validationAppSettings.ts 的 robinrunProjectEntrySchema，
+ * 两处形状必须保持一致（schema 侧有编译期双向可赋值守卫）。
+ */
+export interface RobinRunProjectEntry {
+  id: string;
+  name: string;
+  path: string;
+  createdAt: number;
+  lastOpenedAt: number;
+}
+
 export interface AppSettings {
   /** 当前 App/Host 不再显示提交前体验套餐推荐；不改变任何入口的模型选择。 */
   startPlanRecommendationDismissed?: boolean;
@@ -442,4 +456,9 @@ export interface AppSettings {
   };
   /** 设置页里的临时 endpoint override；正式/测试默认 base url 由 ROBINRUN_BASE_URL env 管理。 */
   robinrunEndpointOrigin?: string;
+  /**
+   * RobinRun 运营项目注册表：launcher（项目启动台）的持久化事实来源。
+   * path 是项目工作空间目录（本地 workspace identity 键）；schema 见 validationAppSettings.ts。
+   */
+  robinrunProjects?: RobinRunProjectEntry[];
 }

@@ -87,6 +87,7 @@ import { consumeRobinrunJwtInvalidRestartMarker } from "@/root/robinrunJwtInvali
 import { useDesktopNativeThemeSync } from "@/root/useDesktopNativeThemeSync.js";
 import { useRootPlatformEffects } from "@/root/useRootPlatformEffects.js";
 import { useRootWorkspaceActions } from "@/root/useRootWorkspaceActions.js";
+import { RobinRunLauncher } from "@/robinrun/RobinRunLauncher.js";
 import { useBotBroadcastEffects } from "@/root/useBotBroadcastEffects.js";
 import { registerBaseWorkspaceServices } from "@/store/remoteWorkspaceSessionStore.js";
 import type { RootProps } from "@/root/types.js";
@@ -1573,13 +1574,29 @@ function RootInner({
   }
 
   if (!workspaceShellPath) {
-    return remoteConnectionDialogOpen || directoryBrowserOpen || rootModelSelectionErrorNode ? (
-      <RootShell>
-        {rootModelSelectionErrorNode}
-        {remoteConnectionDialogOpen ? remoteConnectionDialog : null}
-        {directoryBrowserDialog}
-      </RootShell>
-    ) : null;
+    if (remoteConnectionDialogOpen || directoryBrowserOpen || rootModelSelectionErrorNode) {
+      return (
+        <RootShell>
+          {rootModelSelectionErrorNode}
+          {remoteConnectionDialogOpen ? remoteConnectionDialog : null}
+          {directoryBrowserDialog}
+        </RootShell>
+      );
+    }
+    // RobinRun：没有打开的工作空间时进入项目启动台（仅桌面端；web 远控保持原行为）。
+    // 启动台负责创建/选择运营项目，项目独占主界面（见 robinrun/RobinRunLauncher.tsx）。
+    if (isDesktop) {
+      return (
+        <RootShell>
+          {requestSecurityBridgeNode}
+          <RobinRunLauncher
+            onOpenProject={handleSelectProject}
+            onOpenWorkspaceViaPicker={() => void handleOpenWorkspace()}
+          />
+        </RootShell>
+      );
+    }
+    return null;
   }
 
   return (
