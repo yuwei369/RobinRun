@@ -1,4 +1,4 @@
-import { formatZCodeAgentProcessName } from "@zcode/shared";
+import { formatRobinRunAgentProcessName } from "@robinrun/shared";
 import { startDraftFromProject, waitForProjectRow } from "./project-sidebar.js";
 import {
   countAgentProcessRows,
@@ -27,11 +27,11 @@ export async function waitForActiveWorkspacePath(
         return await browser.execute((expectedPath) => {
           const tabStore = (
             window as Window & {
-              __zcodeTabStoreE2E?: {
+              __robinrunTabStoreE2E?: {
                 getState?: () => { activeWorkspacePath?: string | null };
               };
             }
-          ).__zcodeTabStoreE2E;
+          ).__robinrunTabStoreE2E;
           return tabStore?.getState?.().activeWorkspacePath === expectedPath;
         }, expectedWorkspacePath);
       } catch {
@@ -75,9 +75,9 @@ export async function assertStableAgentSelection(
   expect(identities).toHaveLength(expectedWorkspacePaths.length);
 
   const expected = new Set(expectedWorkspacePaths);
-  const placeholderPrefix = formatZCodeAgentProcessName("placeholder");
+  const placeholderPrefix = formatRobinRunAgentProcessName("placeholder");
   for (const workspacePath of allWorkspacePaths) {
-    const formatted = formatZCodeAgentProcessName("placeholder", workspacePath);
+    const formatted = formatRobinRunAgentProcessName("placeholder", workspacePath);
     const workspaceNameSuffix = formatted.slice(placeholderPrefix.length);
     const actual = await countAgentProcessRows({ workspaceNameSuffix });
     expect(actual).toBe(expected.has(workspacePath) ? 1 : 0);

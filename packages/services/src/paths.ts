@@ -6,12 +6,12 @@ import { basename, join, win32 } from "node:path";
 import { homedir } from "node:os";
 import {
   DATA_BASE_DIR_FORBIDDEN_WINDOWS_INSTALL_DIR_ERROR_CODE,
-  ZCODE_AGENT_RUNTIME,
-} from "@zcode/shared";
+  ROBINRUN_AGENT_RUNTIME,
+} from "@robinrun/shared";
 
 let _dataBaseDir: string | null = null;
-export const ZCODE_WINDOWS_APP_INSTALL_DIR_ENV = "ZCODE_WINDOWS_APP_INSTALL_DIR";
-const envDataBaseDir = process.env.ZCODE_DATA_BASE_DIR?.trim() || null;
+export const ROBINRUN_WINDOWS_APP_INSTALL_DIR_ENV = "ROBINRUN_WINDOWS_APP_INSTALL_DIR";
+const envDataBaseDir = process.env.ROBINRUN_DATA_BASE_DIR?.trim() || null;
 const defaultDataBaseDir = process.env.HOME?.trim() || homedir();
 
 export interface DataBaseDirTargetValidationOptions {
@@ -33,7 +33,7 @@ export function setDataBaseDir(dir: string | null): void {
   _dataBaseDir = dir?.trim() || null;
 }
 
-/** Get the current base directory. Priority: setDataBaseDir() > env ZCODE_DATA_BASE_DIR > homedir(). */
+/** Get the current base directory. Priority: setDataBaseDir() > env ROBINRUN_DATA_BASE_DIR > homedir(). */
 export function getDataBaseDir(): string {
   if (_dataBaseDir) return _dataBaseDir;
   if (envDataBaseDir) return envDataBaseDir;
@@ -42,26 +42,26 @@ export function getDataBaseDir(): string {
   return defaultDataBaseDir;
 }
 
-/** {dataBaseDir}/.zcode */
-export function getZCodeDataRootDir(): string {
-  return join(getDataBaseDir(), ".zcode");
+/** {dataBaseDir}/.robinrun */
+export function getRobinRunDataRootDir(): string {
+  return join(getDataBaseDir(), ".robinrun");
 }
 
-/** 非项目对话共享的真实工作目录；默认 ~/.zcode/workspace/default。 */
+/** 非项目对话共享的真实工作目录；默认 ~/.robinrun/workspace/default。 */
 export function getConversationWorkspaceDir(): string {
-  return join(getZCodeDataRootDir(), "workspace", "default");
+  return join(getRobinRunDataRootDir(), "workspace", "default");
 }
 
-/** {dataBaseDir}/.zcode/v2 */
+/** {dataBaseDir}/.robinrun/v2 */
 export function getAppConfigDir(): string {
-  return join(getZCodeDataRootDir(), "v2");
+  return join(getRobinRunDataRootDir(), "v2");
 }
 
 /**
  * Agent 侧用户级默认指令（个性化）文件的 home 解析。
- * 必须与 CLI adapter（apps/zcode-cli/packages/adapters/src/context/index.ts 的
+ * 必须与 CLI adapter（apps/robinrun-cli/packages/adapters/src/context/index.ts 的
  * resolveUserHomeDir）保持完全一致：只认 HOME/USERPROFILE。不能改用
- * ZCODE_DATA_BASE_DIR（CLI 读该文件时忽略它）或 ZCODE_DESKTOP_HOME_DIR
+ * ROBINRUN_DATA_BASE_DIR（CLI 读该文件时忽略它）或 ROBINRUN_DESKTOP_HOME_DIR
  * （agent 子进程不认），否则 App 写的文件和 Agent 读的文件会分叉。
  */
 export function resolveAgentUserInstructionsHomeDir(env: NodeJS.ProcessEnv = process.env): string {
@@ -69,9 +69,9 @@ export function resolveAgentUserInstructionsHomeDir(env: NodeJS.ProcessEnv = pro
   return envHome && envHome.length > 0 ? envHome : homedir();
 }
 
-/** `{home}/.zcode/AGENTS.md`：用户自定义指令（个性化）的唯一事实源文件。 */
+/** `{home}/.robinrun/AGENTS.md`：用户自定义指令（个性化）的唯一事实源文件。 */
 export function getAgentUserInstructionsFilePath(env: NodeJS.ProcessEnv = process.env): string {
-  return join(resolveAgentUserInstructionsHomeDir(env), ".zcode", "AGENTS.md");
+  return join(resolveAgentUserInstructionsHomeDir(env), ".robinrun", "AGENTS.md");
 }
 
 function readEnvValue(env: Record<string, string | undefined>, key: string): string | undefined {
@@ -132,11 +132,11 @@ function collectWindowsForbiddenAppInstallDirs(
   const localAppData = readEnvValue(env, "LOCALAPPDATA");
   const candidates = [
     options.appInstallDir,
-    readEnvValue(env, ZCODE_WINDOWS_APP_INSTALL_DIR_ENV),
-    programFiles ? win32.join(programFiles, "ZCode") : null,
-    programFilesX86 ? win32.join(programFilesX86, "ZCode") : null,
-    programW6432 ? win32.join(programW6432, "ZCode") : null,
-    localAppData ? win32.join(localAppData, "Programs", "ZCode") : null,
+    readEnvValue(env, ROBINRUN_WINDOWS_APP_INSTALL_DIR_ENV),
+    programFiles ? win32.join(programFiles, "RobinRun") : null,
+    programFilesX86 ? win32.join(programFilesX86, "RobinRun") : null,
+    programW6432 ? win32.join(programW6432, "RobinRun") : null,
+    localAppData ? win32.join(localAppData, "Programs", "RobinRun") : null,
   ];
   const seen = new Set<string>();
   const result: string[] = [];
@@ -179,15 +179,15 @@ export function validateDataBaseDirTarget(
 }
 
 export function getExportLogStageDir(): string {
-  return join(getZCodeDataRootDir(), "export-log-stage");
+  return join(getRobinRunDataRootDir(), "export-log-stage");
 }
 
 export function getExportLogDir(): string {
-  return join(getZCodeDataRootDir(), "export-log");
+  return join(getRobinRunDataRootDir(), "export-log");
 }
 
 export function getFeedbackRootDir(): string {
-  return join(getZCodeDataRootDir(), "feedback");
+  return join(getRobinRunDataRootDir(), "feedback");
 }
 
 export function getFeedbackAttachmentDir(): string {
@@ -199,10 +199,10 @@ export function getFeedbackLogArchiveDir(): string {
 }
 
 export function getGitCheckpointIndexRootDir(): string {
-  return join(getZCodeDataRootDir(), "git-checkpoint-index");
+  return join(getRobinRunDataRootDir(), "git-checkpoint-index");
 }
 
-/** ~/.zcode/v2/tasks-index.sqlite */
+/** ~/.robinrun/v2/tasks-index.sqlite */
 export function getTasksIndexDatabasePath(): string {
   return join(getAppConfigDir(), "tasks-index.sqlite");
 }
@@ -212,7 +212,7 @@ function getWorkspaceKey(workspacePath: string, workspaceIdentity?: string): str
   return workspaceIdentity?.trim() || workspacePath;
 }
 
-/** 与 ZCode session 持久化一致：使用 workspaceKey 的 SHA-256 前 12 位 */
+/** 与 RobinRun session 持久化一致：使用 workspaceKey 的 SHA-256 前 12 位 */
 export function getWorkspaceHash(workspacePath: string, workspaceIdentity?: string): string {
   return createHash("sha256")
     .update(getWorkspaceKey(workspacePath, workspaceIdentity))
@@ -220,12 +220,12 @@ export function getWorkspaceHash(workspacePath: string, workspaceIdentity?: stri
     .slice(0, 12);
 }
 
-/** ~/.zcode/v2/sessions/{workspaceHash} */
+/** ~/.robinrun/v2/sessions/{workspaceHash} */
 function getTaskSessionDir(workspacePath: string, workspaceIdentity?: string): string {
   return join(getAppConfigDir(), "sessions", getWorkspaceHash(workspacePath, workspaceIdentity));
 }
 
-/** ~/.zcode/v2/sessions/{workspaceHash}/{taskId}.json */
+/** ~/.robinrun/v2/sessions/{workspaceHash}/{taskId}.json */
 export function getLegacyTaskSessionSnapshotPath(
   workspacePath: string,
   taskId: string,
@@ -234,7 +234,7 @@ export function getLegacyTaskSessionSnapshotPath(
   return join(getTaskSessionDir(workspacePath, workspaceIdentity), `${taskId}.json`);
 }
 
-/** ~/.zcode/v2/sessions/{workspaceHash}/{taskId}.deleted.json */
+/** ~/.robinrun/v2/sessions/{workspaceHash}/{taskId}.deleted.json */
 export function getLegacyDeletedTaskSessionSnapshotPath(
   workspacePath: string,
   taskId: string,
@@ -244,24 +244,24 @@ export function getLegacyDeletedTaskSessionSnapshotPath(
 }
 
 /**
- * GLM（唯一 agent provider）的配置目录：~/.zcode/cli。
- * Bugfix：GLM 配置改为直接读写新版 zcode-cli 的全局配置目录，不做 workspace 隔离，
+ * GLM（唯一 agent provider）的配置目录：~/.robinrun/cli。
+ * Bugfix：GLM 配置改为直接读写新版 robinrun-cli 的全局配置目录，不做 workspace 隔离，
  * 避免同机不同工作区配置漂移。
  */
 export function getProviderWorkspaceConfigDir(): string {
-  return ZCODE_AGENT_RUNTIME.nativeConfigDir
-    ? join(getDataBaseDir(), ZCODE_AGENT_RUNTIME.nativeConfigDir)
-    : join(getDataBaseDir(), ".zcode", "cli");
+  return ROBINRUN_AGENT_RUNTIME.nativeConfigDir
+    ? join(getDataBaseDir(), ROBINRUN_AGENT_RUNTIME.nativeConfigDir)
+    : join(getDataBaseDir(), ".robinrun", "cli");
 }
 
 /**
- * Copy the .zcode/v2 data directory from one base dir to another.
+ * Copy the .robinrun/v2 data directory from one base dir to another.
  * Excludes setting.json and its transient atomic-write siblings — bootstrap
  * state must only live at the default homedir location.
  */
 export async function copyDataDirectory(oldBaseDir: string, newBaseDir: string): Promise<void> {
-  const oldDir = join(oldBaseDir, ".zcode", "v2");
-  const newDir = join(newBaseDir, ".zcode", "v2");
+  const oldDir = join(oldBaseDir, ".robinrun", "v2");
+  const newDir = join(newBaseDir, ".robinrun", "v2");
   await cp(oldDir, newDir, {
     recursive: true,
     force: false,

@@ -1,18 +1,18 @@
 import type {
-  ZCodeTaskListKind,
-  ZCodeTaskListSortBy,
-  ZCodeTaskListWorkspaceScope,
-} from "@zcode/services";
-import type { ZCodeTaskMeta } from "@zcode/shared";
-import { resolveWorkspaceStateKey } from "@/store/zcodeSessionStoreSelectors.js";
+  RobinRunTaskListKind,
+  RobinRunTaskListSortBy,
+  RobinRunTaskListWorkspaceScope,
+} from "@robinrun/services";
+import type { RobinRunTaskMeta } from "@robinrun/shared";
+import { resolveWorkspaceStateKey } from "@/store/robinrunSessionStoreSelectors.js";
 
 export type TaskEntityKey = string;
 export type TaskListCacheKey = string;
-export type TaskListQueryKind = ZCodeTaskListKind | "workspace";
+export type TaskListQueryKind = RobinRunTaskListKind | "workspace";
 
 export interface TaskListCacheDescriptor {
   kind: TaskListQueryKind;
-  sortBy: ZCodeTaskListSortBy;
+  sortBy: RobinRunTaskListSortBy;
   search: string;
   expanded: boolean;
   visibleLimit: number | null;
@@ -41,14 +41,14 @@ export function buildTaskWorkspaceKey(workspacePath: string, workspaceIdentity?:
   return resolveWorkspaceStateKey(workspacePath, workspaceIdentity);
 }
 
-export function buildTaskEntityKey(task: Pick<ZCodeTaskMeta, "taskId" | "workspacePath" | "workspaceIdentity">): TaskEntityKey {
+export function buildTaskEntityKey(task: Pick<RobinRunTaskMeta, "taskId" | "workspacePath" | "workspaceIdentity">): TaskEntityKey {
   return `${buildTaskWorkspaceKey(task.workspacePath, task.workspaceIdentity)}::${task.taskId}`;
 }
 
 export function normalizeTaskListWorkspaceScopes(
-  scopes: ZCodeTaskListWorkspaceScope[],
-): ZCodeTaskListWorkspaceScope[] {
-  const uniqueScopes = new Map<string, ZCodeTaskListWorkspaceScope>();
+  scopes: RobinRunTaskListWorkspaceScope[],
+): RobinRunTaskListWorkspaceScope[] {
+  const uniqueScopes = new Map<string, RobinRunTaskListWorkspaceScope>();
 
   for (const scope of scopes) {
     const workspaceKey = buildTaskWorkspaceKey(scope.workspacePath, scope.workspaceIdentity);
@@ -69,8 +69,8 @@ function normalizeTaskListSearch(search?: string): string {
 
 export function buildTaskListCacheDescriptor(params: {
   kind: TaskListQueryKind;
-  workspaceScopes: ZCodeTaskListWorkspaceScope[];
-  sortBy: ZCodeTaskListSortBy;
+  workspaceScopes: RobinRunTaskListWorkspaceScope[];
+  sortBy: RobinRunTaskListSortBy;
   search?: string;
   expanded: boolean;
   visibleLimit?: number | null;

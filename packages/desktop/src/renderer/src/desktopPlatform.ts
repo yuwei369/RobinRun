@@ -1,10 +1,10 @@
-import { recordArmsCustomEventForE2E } from "@zcode/ui";
+import { recordArmsCustomEventForE2E } from "@robinrun/ui";
 import {
   DesktopCommandIds,
   buildLocalMediaPreviewUrl,
   unwrapRemoteWorkspaceBindResult,
   type IPlatformService,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 
 import { desktopBrowserPlatformBridge } from "./desktopBrowserPlatformBridge.js";
 import { createDesktopPluginSandboxPlatform } from "./plugin-sandbox/desktopPluginSandboxPlatform.js";
@@ -18,204 +18,204 @@ export function createDesktopPlatform(options: {
     pluginSandbox: createDesktopPluginSandboxPlatform(),
     createLocalMediaPreviewUrl: buildLocalMediaPreviewUrl,
     isLocalDevelopmentRuntime: options.isLocalDevelopmentRuntime,
-    selectDirectory: () => window.zcode.selectDirectory(),
-    selectDirectories: () => window.zcode.selectDirectories(),
-    selectFile: () => window.zcode.selectFile(),
-    selectFiles: () => window.zcode.selectFiles?.() ?? Promise.resolve([]),
-    createTempTextAttachment: (payload) => window.zcode.createTempTextAttachment(payload),
+    selectDirectory: () => window.robinrun.selectDirectory(),
+    selectDirectories: () => window.robinrun.selectDirectories(),
+    selectFile: () => window.robinrun.selectFile(),
+    selectFiles: () => window.robinrun.selectFiles?.() ?? Promise.resolve([]),
+    createTempTextAttachment: (payload) => window.robinrun.createTempTextAttachment(payload),
     materializeWorkflowArtifactFile: (payload) =>
-      window.zcode.materializeWorkflowArtifactFile(payload),
-    onRemoteConnectionLog: (handler) => window.zcode.onRemoteConnectionLog(handler),
-    onRemoteSessionClosed: (handler) => window.zcode.onRemoteSessionClosed(handler),
+      window.robinrun.materializeWorkflowArtifactFile(payload),
+    onRemoteConnectionLog: (handler) => window.robinrun.onRemoteConnectionLog(handler),
+    onRemoteSessionClosed: (handler) => window.robinrun.onRemoteSessionClosed(handler),
     // Source 自动重连会替换 logical session；统一由 preload bridge 转发换代事件。
     onRemoteSessionReconnected: (handler) =>
-      window.zcode.onRemoteSessionReconnected?.(handler) ?? (() => {}),
+      window.robinrun.onRemoteSessionReconnected?.(handler) ?? (() => {}),
     activateOrSetWorkspace: (path) =>
-      window.zcode.activateOrSetWorkspace?.(path) ?? Promise.resolve({ activated: false }),
+      window.robinrun.activateOrSetWorkspace?.(path) ?? Promise.resolve({ activated: false }),
     connectRemote: (remoteOptions, requestId, context) =>
-      window.zcode.connectRemote(remoteOptions, requestId, context),
+      window.robinrun.connectRemote(remoteOptions, requestId, context),
     requestSourceSettingsAttachment: (sourceServerId) =>
-      window.zcode.requestSourceSettingsAttachment?.(sourceServerId) ??
+      window.robinrun.requestSourceSettingsAttachment?.(sourceServerId) ??
       Promise.reject(new Error("Source settings attachment bridge unavailable")),
     cancelPendingRemoteConnection: (requestId) =>
-      window.zcode.cancelPendingRemoteConnection?.(requestId) ?? Promise.resolve(),
+      window.robinrun.cancelPendingRemoteConnection?.(requestId) ?? Promise.resolve(),
     bindRemoteWorkspaceSessionContext: async (context) => {
-      if (!window.zcode.bindRemoteWorkspaceSessionContext) {
+      if (!window.robinrun.bindRemoteWorkspaceSessionContext) {
         throw new Error("Desktop bindRemoteWorkspaceSessionContext bridge unavailable");
       }
       // preload 返回结构化结果，在页面一侧还原错误才能保留 code/retryable。
       return unwrapRemoteWorkspaceBindResult(
-        await window.zcode.bindRemoteWorkspaceSessionContext(context),
+        await window.robinrun.bindRemoteWorkspaceSessionContext(context),
       );
     },
-    startWebRemoteControl: (context) => window.zcode.startWebRemoteControl(context),
-    stopWebRemoteControl: () => window.zcode.stopWebRemoteControl(),
-    getWebRemoteControlStatus: () => window.zcode.getWebRemoteControlStatus(),
+    startWebRemoteControl: (context) => window.robinrun.startWebRemoteControl(context),
+    stopWebRemoteControl: () => window.robinrun.stopWebRemoteControl(),
+    getWebRemoteControlStatus: () => window.robinrun.getWebRemoteControlStatus(),
     onWebRemoteControlStatusChanged: (handler) =>
-      window.zcode.onWebRemoteControlStatusChanged?.(handler) ?? (() => {}),
-    disposeRemoteSession: (sessionId) => window.zcode.disposeRemoteSession(sessionId),
-    isDockerAvailable: () => window.zcode.isDockerAvailable(),
-    listWSLDistros: () => window.zcode.listWSLDistros(),
-    listDockerContainers: () => window.zcode.listDockerContainers(),
-    listSSHConfigAliases: () => window.zcode.listSSHConfigAliases(),
-    loadMcpFromUserDirectory: (payload) => window.zcode.loadMcpFromUserDirectory(payload),
-    saveMcpToUserDirectory: (payload) => window.zcode.saveMcpToUserDirectory(payload),
-    migrateLegacyCommonMcp: (payload) => window.zcode.migrateLegacyCommonMcp(payload),
-    openExternal: (url) => window.zcode.openExternal(url),
-    openFeedback: () => window.zcode.executeDesktopCommand(DesktopCommandIds.OpenFeedback),
-    openCommunity: () => window.zcode.executeDesktopCommand(DesktopCommandIds.OpenCommunity),
-    canOpenCommunity: (locale) => window.zcode.canOpenCommunity(locale),
-    openInFileManager: (path) => window.zcode.openInFileManager(path),
-    openExternalFile: (path) => window.zcode.openExternalFile(path),
-    openCuaPermissionOnboarding: window.zcode.openCuaPermissionOnboarding
+      window.robinrun.onWebRemoteControlStatusChanged?.(handler) ?? (() => {}),
+    disposeRemoteSession: (sessionId) => window.robinrun.disposeRemoteSession(sessionId),
+    isDockerAvailable: () => window.robinrun.isDockerAvailable(),
+    listWSLDistros: () => window.robinrun.listWSLDistros(),
+    listDockerContainers: () => window.robinrun.listDockerContainers(),
+    listSSHConfigAliases: () => window.robinrun.listSSHConfigAliases(),
+    loadMcpFromUserDirectory: (payload) => window.robinrun.loadMcpFromUserDirectory(payload),
+    saveMcpToUserDirectory: (payload) => window.robinrun.saveMcpToUserDirectory(payload),
+    migrateLegacyCommonMcp: (payload) => window.robinrun.migrateLegacyCommonMcp(payload),
+    openExternal: (url) => window.robinrun.openExternal(url),
+    openFeedback: () => window.robinrun.executeDesktopCommand(DesktopCommandIds.OpenFeedback),
+    openCommunity: () => window.robinrun.executeDesktopCommand(DesktopCommandIds.OpenCommunity),
+    canOpenCommunity: (locale) => window.robinrun.canOpenCommunity(locale),
+    openInFileManager: (path) => window.robinrun.openInFileManager(path),
+    openExternalFile: (path) => window.robinrun.openExternalFile(path),
+    openCuaPermissionOnboarding: window.robinrun.openCuaPermissionOnboarding
       ? (permissionOptions) =>
-          window.zcode.openCuaPermissionOnboarding?.(permissionOptions) ??
+          window.robinrun.openCuaPermissionOnboarding?.(permissionOptions) ??
           Promise.resolve({ success: false, error: "not_supported" })
       : undefined,
-    prepareCuaHelperPermissionDrag: window.zcode.prepareCuaHelperPermissionDrag
+    prepareCuaHelperPermissionDrag: window.robinrun.prepareCuaHelperPermissionDrag
       ? () =>
-          window.zcode.prepareCuaHelperPermissionDrag?.() ??
+          window.robinrun.prepareCuaHelperPermissionDrag?.() ??
           Promise.resolve({ success: false, error: "not_supported" })
       : undefined,
-    startCuaHelperPermissionDrag: window.zcode.startCuaHelperPermissionDrag
-      ? () => window.zcode.startCuaHelperPermissionDrag?.()
+    startCuaHelperPermissionDrag: window.robinrun.startCuaHelperPermissionDrag
+      ? () => window.robinrun.startCuaHelperPermissionDrag?.()
       : undefined,
     notifyWebRemoteControlAuthStateChanged: (change) =>
-      window.zcode.notifyWebRemoteControlAuthStateChanged(change),
-    registerOAuthState: (payload) => window.zcode.registerOAuthState(payload),
-    onOAuthCallback: (callback) => window.zcode.onOAuthCallback(callback),
-    onPaymentCallback: (callback) => window.zcode.onPaymentCallback(callback),
-    onShareImport: (callback) => window.zcode.onShareImport?.(callback) ?? (() => {}),
-    notifyRendererReady: () => window.zcode.notifyRendererReady(),
-    syncTelemetryContext: (context) => window.zcode.syncTelemetryContext(context),
-    reportTelemetryEvent: (payload) => window.zcode.reportTelemetryEvent(payload),
+      window.robinrun.notifyWebRemoteControlAuthStateChanged(change),
+    registerOAuthState: (payload) => window.robinrun.registerOAuthState(payload),
+    onOAuthCallback: (callback) => window.robinrun.onOAuthCallback(callback),
+    onPaymentCallback: (callback) => window.robinrun.onPaymentCallback(callback),
+    onShareImport: (callback) => window.robinrun.onShareImport?.(callback) ?? (() => {}),
+    notifyRendererReady: () => window.robinrun.notifyRendererReady(),
+    syncTelemetryContext: (context) => window.robinrun.syncTelemetryContext(context),
+    reportTelemetryEvent: (payload) => window.robinrun.reportTelemetryEvent(payload),
     reportArmsCustomEvent: (payload) => {
       recordArmsCustomEventForE2E(payload);
-      return window.zcode.reportArmsCustomEvent(payload);
+      return window.robinrun.reportArmsCustomEvent(payload);
     },
-    getRendererActionTraceConfig: window.zcode.getRendererActionTraceConfig
-      ? () => window.zcode.getRendererActionTraceConfig!()
+    getRendererActionTraceConfig: window.robinrun.getRendererActionTraceConfig
+      ? () => window.robinrun.getRendererActionTraceConfig!()
       : undefined,
-    onRendererActionTraceConfigChanged: window.zcode.onRendererActionTraceConfigChanged
-      ? (callback) => window.zcode.onRendererActionTraceConfigChanged!(callback)
+    onRendererActionTraceConfigChanged: window.robinrun.onRendererActionTraceConfigChanged
+      ? (callback) => window.robinrun.onRendererActionTraceConfigChanged!(callback)
       : undefined,
-    reportLocalTtftBatch: (batch) => window.zcode.reportLocalTtftBatch(batch),
-    reportRendererActionTraceBatch: window.zcode.reportRendererActionTraceBatch
-      ? (batch) => window.zcode.reportRendererActionTraceBatch!(batch)
+    reportLocalTtftBatch: (batch) => window.robinrun.reportLocalTtftBatch(batch),
+    reportRendererActionTraceBatch: window.robinrun.reportRendererActionTraceBatch
+      ? (batch) => window.robinrun.reportRendererActionTraceBatch!(batch)
       : undefined,
-    reportRendererHeapSample: window.zcode.reportRendererHeapSample
-      ? (sample) => window.zcode.reportRendererHeapSample!(sample)
+    reportRendererHeapSample: window.robinrun.reportRendererHeapSample
+      ? (sample) => window.robinrun.reportRendererHeapSample!(sample)
       : undefined,
-    showTaskNotification: (payload) => window.zcode.showTaskNotification(payload),
-    syncWindowTabs: (paths) => window.zcode.syncWindowTabs(paths),
+    showTaskNotification: (payload) => window.robinrun.showTaskNotification(payload),
+    syncWindowTabs: (paths) => window.robinrun.syncWindowTabs(paths),
     syncWebRemoteControlWorkspaces: (workspaces) =>
-      window.zcode.syncWebRemoteControlWorkspaces?.(workspaces),
+      window.robinrun.syncWebRemoteControlWorkspaces?.(workspaces),
     onWebRemoteControlReconnectWorkspace: (handler) =>
-      window.zcode.onWebRemoteControlReconnectWorkspace?.(handler) ?? (() => {}),
+      window.robinrun.onWebRemoteControlReconnectWorkspace?.(handler) ?? (() => {}),
     onWebRemoteControlRendererAction: (handler) =>
-      window.zcode.onWebRemoteControlRendererAction?.(handler) ?? (() => {}),
-    syncWindowUnreadCount: (count) => window.zcode.syncWindowUnreadCount(count),
-    syncActiveTaskSession: (sessionId) => window.zcode.syncActiveTaskSession(sessionId),
-    syncAppSettings: (patch) => window.zcode.syncAppSettings?.(patch),
+      window.robinrun.onWebRemoteControlRendererAction?.(handler) ?? (() => {}),
+    syncWindowUnreadCount: (count) => window.robinrun.syncWindowUnreadCount(count),
+    syncActiveTaskSession: (sessionId) => window.robinrun.syncActiveTaskSession(sessionId),
+    syncAppSettings: (patch) => window.robinrun.syncAppSettings?.(patch),
     // 桥缺失（旧 preload 升级窗口）时按 supported 兜底，与 Windows 现状一致，设置开关可用。
     getCloseToTrayCapability: () =>
-      window.zcode.getCloseToTrayCapability?.() ??
+      window.robinrun.getCloseToTrayCapability?.() ??
       Promise.resolve({ supported: true, gnomeLikeWithoutTray: false }),
-    setShortcutRecordingActive: (active) => window.zcode.setShortcutRecordingActive?.(active),
-    onFocusTab: (handler) => window.zcode.onFocusTab(handler),
-    onNewTab: (handler) => window.zcode.onNewTab(handler),
+    setShortcutRecordingActive: (active) => window.robinrun.setShortcutRecordingActive?.(active),
+    onFocusTab: (handler) => window.robinrun.onFocusTab(handler),
+    onNewTab: (handler) => window.robinrun.onNewTab(handler),
     onCloseActiveContextRequest: (handler) =>
-      window.zcode.onCloseActiveContextRequest?.(handler) ?? (() => {}),
-    onOpenBrowserUrl: (handler) => window.zcode.onOpenBrowserUrl?.(handler) ?? (() => {}),
+      window.robinrun.onCloseActiveContextRequest?.(handler) ?? (() => {}),
+    onOpenBrowserUrl: (handler) => window.robinrun.onOpenBrowserUrl?.(handler) ?? (() => {}),
     onEmbeddedBrowserPermissionPrompt: (handler) =>
-      window.zcode.onEmbeddedBrowserPermissionPrompt?.(handler) ?? (() => {}),
+      window.robinrun.onEmbeddedBrowserPermissionPrompt?.(handler) ?? (() => {}),
     resolveEmbeddedBrowserPermissionPrompt: (request) =>
-      window.zcode.resolveEmbeddedBrowserPermissionPrompt?.(request),
+      window.robinrun.resolveEmbeddedBrowserPermissionPrompt?.(request),
     getEmbeddedBrowserSitePermissions: () =>
-      window.zcode.getEmbeddedBrowserSitePermissions?.() ?? Promise.resolve({}),
+      window.robinrun.getEmbeddedBrowserSitePermissions?.() ?? Promise.resolve({}),
     setEmbeddedBrowserSitePermission: (request) =>
-      window.zcode.setEmbeddedBrowserSitePermission?.(request) ?? Promise.resolve({}),
+      window.robinrun.setEmbeddedBrowserSitePermission?.(request) ?? Promise.resolve({}),
     clearEmbeddedBrowserSitePermissions: () =>
-      window.zcode.clearEmbeddedBrowserSitePermissions?.() ?? Promise.resolve({}),
+      window.robinrun.clearEmbeddedBrowserSitePermissions?.() ?? Promise.resolve({}),
     resetEmbeddedBrowserSitePermission: (request) =>
-      window.zcode.resetEmbeddedBrowserSitePermission?.(request) ?? Promise.resolve({}),
+      window.robinrun.resetEmbeddedBrowserSitePermission?.(request) ?? Promise.resolve({}),
     onBrowserViewScreenshotSurfacePrepare: (handler) =>
-      window.zcode.onBrowserViewScreenshotSurfacePrepare?.(handler) ?? (() => {}),
+      window.robinrun.onBrowserViewScreenshotSurfacePrepare?.(handler) ?? (() => {}),
     onBrowserViewScreenshotSurfaceRelease: (handler) =>
-      window.zcode.onBrowserViewScreenshotSurfaceRelease?.(handler) ?? (() => {}),
+      window.robinrun.onBrowserViewScreenshotSurfaceRelease?.(handler) ?? (() => {}),
     browserViewScreenshotSurfaceReady: (payload) =>
-      window.zcode.browserViewScreenshotSurfaceReady?.(payload),
+      window.robinrun.browserViewScreenshotSurfaceReady?.(payload),
     ...desktopBrowserPlatformBridge,
-    onNewTask: (handler) => window.zcode.onNewTask(handler),
+    onNewTask: (handler) => window.robinrun.onNewTask(handler),
     onOpenWorkspace: (handler) => {
       // 开发态或升级后的旧窗口可能仍运行未暴露 onOpenWorkspace 的 preload，
       // renderer 直接调用会在启动时崩溃。这里和 activateOrSetWorkspace 一样做兼容兜底，
       // 缺少该 bridge 时只禁用原生菜单回调，不影响应用继续打开。
-      return window.zcode.onOpenWorkspace?.(handler) ?? (() => {});
+      return window.robinrun.onOpenWorkspace?.(handler) ?? (() => {});
     },
-    onOpenWorkspacePath: (handler) => window.zcode.onOpenWorkspacePath?.(handler) ?? (() => {}),
-    onOpenFeedbackDialog: (handler) => window.zcode.onOpenFeedbackDialog?.(handler) ?? (() => {}),
-    onOpenTicketsPanel: (handler) => window.zcode.onOpenTicketsPanel?.(handler) ?? (() => {}),
-    onWindowFullscreenChanged: (handler) => window.zcode.onWindowFullscreenChanged(handler),
-    getDesktopWindowChromeState: window.zcode.getDesktopWindowChromeState
-      ? () => window.zcode.getDesktopWindowChromeState!()
+    onOpenWorkspacePath: (handler) => window.robinrun.onOpenWorkspacePath?.(handler) ?? (() => {}),
+    onOpenFeedbackDialog: (handler) => window.robinrun.onOpenFeedbackDialog?.(handler) ?? (() => {}),
+    onOpenTicketsPanel: (handler) => window.robinrun.onOpenTicketsPanel?.(handler) ?? (() => {}),
+    onWindowFullscreenChanged: (handler) => window.robinrun.onWindowFullscreenChanged(handler),
+    getDesktopWindowChromeState: window.robinrun.getDesktopWindowChromeState
+      ? () => window.robinrun.getDesktopWindowChromeState!()
       : undefined,
-    onDesktopWindowChromeStateChanged: window.zcode.onDesktopWindowChromeStateChanged
-      ? (handler) => window.zcode.onDesktopWindowChromeStateChanged!(handler)
+    onDesktopWindowChromeStateChanged: window.robinrun.onDesktopWindowChromeStateChanged
+      ? (handler) => window.robinrun.onDesktopWindowChromeStateChanged!(handler)
       : undefined,
-    getWindowControlsOverlayMetrics: () => window.zcode.getWindowControlsOverlayMetrics?.() ?? null,
+    getWindowControlsOverlayMetrics: () => window.robinrun.getWindowControlsOverlayMetrics?.() ?? null,
     onWindowControlsOverlayChanged: (handler) =>
-      window.zcode.onWindowControlsOverlayChanged?.(handler) ?? (() => {}),
+      window.robinrun.onWindowControlsOverlayChanged?.(handler) ?? (() => {}),
     getDesktopZoomLevel: () =>
-      window.zcode.getDesktopZoomLevel?.() ?? Promise.resolve({ zoomLevel: 0 }),
+      window.robinrun.getDesktopZoomLevel?.() ?? Promise.resolve({ zoomLevel: 0 }),
     onDesktopZoomLevelChanged: (handler) =>
-      window.zcode.onDesktopZoomLevelChanged?.(handler) ?? (() => {}),
-    onTaskNotificationClick: (handler) => window.zcode.onTaskNotificationClick(handler),
-    exportLogs: () => window.zcode.exportLogs(),
+      window.robinrun.onDesktopZoomLevelChanged?.(handler) ?? (() => {}),
+    onTaskNotificationClick: (handler) => window.robinrun.onTaskNotificationClick(handler),
+    exportLogs: () => window.robinrun.exportLogs(),
     captureWindowScreenshot: () =>
-      window.zcode.captureWindowScreenshot?.() ?? Promise.resolve(null),
-    onUpdateReady: (callback) => window.zcode.onUpdateReady(callback),
-    onUpdateCheckResult: (callback) => window.zcode.onUpdateCheckResult(callback),
-    onUpdateStateChanged: (callback) => window.zcode.onUpdateStateChanged?.(callback) ?? (() => {}),
+      window.robinrun.captureWindowScreenshot?.() ?? Promise.resolve(null),
+    onUpdateReady: (callback) => window.robinrun.onUpdateReady(callback),
+    onUpdateCheckResult: (callback) => window.robinrun.onUpdateCheckResult(callback),
+    onUpdateStateChanged: (callback) => window.robinrun.onUpdateStateChanged?.(callback) ?? (() => {}),
     getUpdateState: () =>
-      window.zcode.getUpdateState?.() ?? Promise.resolve({ kind: "idle", enabled: true }),
-    downloadUpdate: () => window.zcode.downloadUpdate?.() ?? Promise.resolve(),
-    cancelUpdateDownload: () => window.zcode.cancelUpdateDownload?.() ?? Promise.resolve(),
-    openUpdateStatusWindow: () => window.zcode.openUpdateStatusWindow?.() ?? Promise.resolve(),
+      window.robinrun.getUpdateState?.() ?? Promise.resolve({ kind: "idle", enabled: true }),
+    downloadUpdate: () => window.robinrun.downloadUpdate?.() ?? Promise.resolve(),
+    cancelUpdateDownload: () => window.robinrun.cancelUpdateDownload?.() ?? Promise.resolve(),
+    openUpdateStatusWindow: () => window.robinrun.openUpdateStatusWindow?.() ?? Promise.resolve(),
     getAutoUpdatePreferences: () =>
-      window.zcode.getAutoUpdatePreferences?.() ??
+      window.robinrun.getAutoUpdatePreferences?.() ??
       Promise.resolve({ autoDownloadAndInstallUpdates: false }),
     setAutoDownloadAndInstallUpdates: (enabled) =>
-      window.zcode.setAutoDownloadAndInstallUpdates?.(enabled) ?? Promise.resolve(),
+      window.robinrun.setAutoDownloadAndInstallUpdates?.(enabled) ?? Promise.resolve(),
     getDesktopSessionActivity: () =>
-      window.zcode.getDesktopSessionActivity?.() ??
+      window.robinrun.getDesktopSessionActivity?.() ??
       Promise.resolve({ runningAgentSessionCount: 0 }),
-    getZCodeStdioTapDevState: () =>
-      window.zcode.getZCodeStdioTapDevState?.() ??
+    getRobinRunStdioTapDevState: () =>
+      window.robinrun.getRobinRunStdioTapDevState?.() ??
       Promise.resolve({ enabled: false, visible: false, logDir: "", statePath: "" }),
-    onSettingsChanged: (callback) => window.zcode.onSettingsChanged?.(callback) ?? (() => {}),
+    onSettingsChanged: (callback) => window.robinrun.onSettingsChanged?.(callback) ?? (() => {}),
     onApplicationLocaleChanged: (callback) =>
-      window.zcode.onApplicationLocaleChanged?.(callback) ?? (() => {}),
-    onPostUpdateReleaseNotes: (callback) => window.zcode.onPostUpdateReleaseNotes(callback),
+      window.robinrun.onApplicationLocaleChanged?.(callback) ?? (() => {}),
+    onPostUpdateReleaseNotes: (callback) => window.robinrun.onPostUpdateReleaseNotes(callback),
     acknowledgePostUpdateReleaseNotes: (version) =>
-      window.zcode.acknowledgePostUpdateReleaseNotes(version),
-    skipUpdateVersion: (version) => window.zcode.skipUpdateVersion?.(version) ?? Promise.resolve(),
-    quitAndInstallUpdate: () => window.zcode.quitAndInstallUpdate(),
-    getInstalledEditors: (filePath) => window.zcode.getInstalledEditors(filePath),
-    getFileApplications: (target) => window.zcode.getFileApplications(target),
+      window.robinrun.acknowledgePostUpdateReleaseNotes(version),
+    skipUpdateVersion: (version) => window.robinrun.skipUpdateVersion?.(version) ?? Promise.resolve(),
+    quitAndInstallUpdate: () => window.robinrun.quitAndInstallUpdate(),
+    getInstalledEditors: (filePath) => window.robinrun.getInstalledEditors(filePath),
+    getFileApplications: (target) => window.robinrun.getFileApplications(target),
     openFileWithApplication: (applicationId, target) =>
-      window.zcode.openFileWithApplication(applicationId, target),
+      window.robinrun.openFileWithApplication(applicationId, target),
     getApplicationIcon: (bundleId) =>
-      window.zcode.getApplicationIcon?.(bundleId) ?? Promise.resolve(null),
+      window.robinrun.getApplicationIcon?.(bundleId) ?? Promise.resolve(null),
     openInEditor: (editorId, path, editorOptions) =>
-      window.zcode.openInEditor(editorId, path, editorOptions),
-    executeDesktopCommand: (command) => window.zcode.executeDesktopCommand(command),
-    setApplicationLocale: (locale) => window.zcode.setApplicationLocale(locale),
+      window.robinrun.openInEditor(editorId, path, editorOptions),
+    executeDesktopCommand: (command) => window.robinrun.executeDesktopCommand(command),
+    setApplicationLocale: (locale) => window.robinrun.setApplicationLocale(locale),
     getSystemLocale: () =>
-      window.zcode.getSystemLocale?.() ??
+      window.robinrun.getSystemLocale?.() ??
       Promise.resolve(navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US"),
-    setTitleBarTheme: (theme) => window.zcode.setTitleBarTheme(theme),
+    setTitleBarTheme: (theme) => window.robinrun.setTitleBarTheme(theme),
     getDeviceId: () =>
-      (window as Window & { __ZCODE_DEVICE_ID__?: string }).__ZCODE_DEVICE_ID__ ?? "",
+      (window as Window & { __ROBINRUN_DEVICE_ID__?: string }).__ROBINRUN_DEVICE_ID__ ?? "",
   };
 }

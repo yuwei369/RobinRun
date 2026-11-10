@@ -8,7 +8,7 @@ import {
   projectAccessTokenRequestFailureCode,
   ProjectAccessTokenTransientError,
 } from "./project-access-token.js";
-import { ZCODE_VERSION } from "./version.js";
+import { ROBINRUN_VERSION } from "./version.js";
 import { isCredentialDecryptError } from "./oauth.js";
 
 const DEFAULT_ORGANIZATION_NAME = "默认机构";
@@ -217,8 +217,8 @@ export class ProjectAccessTokenClient {
               method: "POST",
               headers,
               body: JSON.stringify({
-                clientType: "zcode",
-                clientVersion: ZCODE_VERSION,
+                clientType: "robinrun",
+                clientVersion: ROBINRUN_VERSION,
               }),
             },
           );
@@ -311,7 +311,7 @@ export class ProjectAccessTokenClient {
       };
     }
     const url = keyListUrl(origin, location);
-    const name = input.team ? "zcode-team-api-key" : "zcode-api-key";
+    const name = input.team ? "robinrun-team-api-key" : "robinrun-api-key";
     const keyHeaders = input.team
       ? {
           ...headers,

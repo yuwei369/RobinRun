@@ -14,7 +14,7 @@ import {
   type TabId,
   type TabState,
   type WorkspacePurpose,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 import {
   persistWorkspaceExpandedPreference,
   readWorkspaceExpansionState,

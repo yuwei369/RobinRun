@@ -7,7 +7,7 @@ import {
   type DataSyncImportResultItem,
   type DataSyncListItem,
   type PluginDataSyncPayload,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 import { pathExists, updateJsonObjectFile } from "#src/fs/atomicFileUtils.js";
 import { createServiceLogger } from "#src/logger/serviceLogger.js";
 import {
@@ -17,8 +17,8 @@ import {
 import { resolvePluginSyncPathWithin } from "#src/plugin-sync/pluginSyncPath.js";
 import {
   createShortHash,
-  getUserZcodeConfigPath,
-  getUserZcodePluginRoot,
+  getUserRobinrunConfigPath,
+  getUserRobinrunPluginRoot,
   normalizePluginIdKey,
   readPluginManifestInfo,
   readUserPluginConfigState,
@@ -40,7 +40,7 @@ const logger = createServiceLogger("plugin-data-sync");
 
 /**
  * 插件目录内的 `data/` 是该端的运行数据：不导出、不参与签名和哈希，覆盖时保留目标端的 `data/`。
- * （CLI 运行时的插件数据目录在 `~/.zcode/cli/plugins/data/<id>`，不在插件目录里，本来就不会被同步触碰。）
+ * （CLI 运行时的插件数据目录在 `~/.robinrun/cli/plugins/data/<id>`，不在插件目录里，本来就不会被同步触碰。）
  */
 const PLUGIN_DATA_DIRECTORY = "data";
 const CONTENT_OPTIONS = { excludeTopLevel: [PLUGIN_DATA_DIRECTORY] } as const;
@@ -72,7 +72,7 @@ function inlinePluginKey(manifest: PluginManifestInfo): string {
  */
 async function resolveInlinePlugins(): Promise<Map<string, ResolvedInlinePlugin>> {
   const config = await readUserPluginConfigState();
-  const pluginRoot = getUserZcodePluginRoot();
+  const pluginRoot = getUserRobinrunPluginRoot();
   const result = new Map<string, ResolvedInlinePlugin>();
   for (const rawDir of config.dirs) {
     const configuredPath = resolve(rawDir);
@@ -136,7 +136,7 @@ export function createInlinePluginDataSyncMethods(options: {
   }
 
   /**
-   * 新建位置：`~/.zcode/plugins/<来源目录名>`；被占用时加短哈希后缀（目录名不参与对齐）。
+   * 新建位置：`~/.robinrun/plugins/<来源目录名>`；被占用时加短哈希后缀（目录名不参与对齐）。
    * 修复：原来先用同步 existsSync 选位置再 rename。existsSync 跟随软链，悬空软链被当成空位，
    * 之后 rename 失败、该项直接失败；检查与写入之间也有竞态。现在直接 rename 到首选位置，
    * 失败后用 lstat 确认是「已被占用」才换带后缀的位置，其他错误原样抛出。
@@ -296,8 +296,8 @@ export function createInlinePluginDataSyncMethods(options: {
     async checkSyncWriteAccess() {
       // 新建要写插件目录和 config.json 的 plugins.dirs。
       return await checkRemoteSyncDirectoriesWriteAccess([
-        getUserZcodePluginRoot(),
-        dirname(getUserZcodeConfigPath()),
+        getUserRobinrunPluginRoot(),
+        dirname(getUserRobinrunConfigPath()),
       ]);
     },
 
@@ -373,7 +373,7 @@ export function createInlinePluginDataSyncMethods(options: {
           `plugin sync archive exceeds limit: ${params.payload.archive.byteLength}/${maxItemBytes}`,
         );
       }
-      const targetRoot = getUserZcodePluginRoot();
+      const targetRoot = getUserRobinrunPluginRoot();
       await mkdir(targetRoot, { recursive: true });
       // 临时目录放在插件根内，保证与目标同盘，rename 是原子替换。插件只按 plugins.dirs 发现，点目录不会被读到。
       const tempRoot = join(targetRoot, `.sync-tmp-${randomUUID()}`);
@@ -428,7 +428,7 @@ async function registerCreatedPlugins(
   const created = results.filter((result) => result.status === "created" && result.created);
   if (created.length === 0) return;
   try {
-    await updateJsonObjectFile(getUserZcodeConfigPath(), (config) => {
+    await updateJsonObjectFile(getUserRobinrunConfigPath(), (config) => {
       const plugins: Record<string, unknown> = isRecord(config.plugins) ? config.plugins : {};
       const dirs = Array.isArray(plugins.dirs)
         ? plugins.dirs.filter((dir): dir is string => typeof dir === "string")

@@ -1,4 +1,4 @@
-import type { CommandAck, CommandEnvelope } from "@zcode/shared/zcode-protocol-v4";
+import type { CommandAck, CommandEnvelope } from "@robinrun/shared/robinrun-protocol-v4";
 import { shouldExposeE2EStoreBridge } from "@/lib/e2eStoreBridge.js";
 
 interface DelayPlan {
@@ -15,9 +15,9 @@ export async function sendWithConversationDelayE2E(
   const host =
     typeof window === "undefined"
       ? undefined
-      : (window as Window & { __zcodeTransportDelayE2E?: DelayPlan });
+      : (window as Window & { __robinrunTransportDelayE2E?: DelayPlan });
   const plan =
-    shouldExposeE2EStoreBridge() && envelope.ttft ? host?.__zcodeTransportDelayE2E : undefined;
+    shouldExposeE2EStoreBridge() && envelope.ttft ? host?.__robinrunTransportDelayE2E : undefined;
   if (!plan || plan.consumed) return send();
   plan.consumed = true;
   const delay = (ms: number) =>

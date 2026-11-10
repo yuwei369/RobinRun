@@ -1,6 +1,6 @@
-import type { Event } from "@zcode/rpc";
-import type { ConversationTelemetryFact } from "@zcode/shared/zcode-protocol-v4";
-import type { IZCodeAgentService } from "#src/zcode-agent/zcodeAgent.js";
+import type { Event } from "@robinrun/rpc";
+import type { ConversationTelemetryFact } from "@robinrun/shared/robinrun-protocol-v4";
+import type { IRobinRunAgentService } from "#src/robinrun-agent/robinrunAgent.js";
 
 export interface ConversationTelemetryWorkspaceTarget {
   workspacePath: string;
@@ -16,12 +16,12 @@ export interface IConversationTelemetryService {
 }
 
 export function createConversationTelemetryService(
-  zcodeAgentService: Pick<IZCodeAgentService, "onDynamicConversationTelemetryFact">,
+  robinrunAgentService: Pick<IRobinRunAgentService, "onDynamicConversationTelemetryFact">,
 ): IConversationTelemetryService {
   return {
     onFact: (target) =>
       // 带 workspace 参数的 RPC Event 必须使用 onDynamic* 命名，
       // 否则 ProxyChannel 会把它当普通 Event，并把 target 误当 listener。
-      zcodeAgentService.onDynamicConversationTelemetryFact(target),
+      robinrunAgentService.onDynamicConversationTelemetryFact(target),
   };
 }

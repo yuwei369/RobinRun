@@ -21,7 +21,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Review recent changes in this repository and highlight what matters.",
     },
     plugin: {
-      stableId: "github@zcode-plugins-official",
+      stableId: "github@robinrun-plugins-official",
       label: {
         cn: "GitHub",
         en: "github",
@@ -41,7 +41,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Review this branch and find issues to fix before submitting a merge request.",
     },
     plugin: {
-      stableId: "gitlab@zcode-plugins-official",
+      stableId: "gitlab@robinrun-plugins-official",
       label: {
         cn: "GitLab",
         en: "gitlab",
@@ -61,7 +61,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Scan this project for security issues and prioritize high-risk fixes.",
     },
     plugin: {
-      stableId: "mimosa@zcode-plugins-official",
+      stableId: "mimosa@robinrun-plugins-official",
       label: {
         cn: "代码安全防护",
         en: "mimosa",
@@ -81,7 +81,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Build a to-do mini program with sign-in and data storage.",
     },
     plugin: {
-      stableId: "cloudbase-skills@zcode-plugins-official",
+      stableId: "cloudbase-skills@robinrun-plugins-official",
       label: {
         cn: "CloudBase",
         en: "cloudbase-skills",
@@ -101,7 +101,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Recreate my website recording as an interactive page.",
     },
     plugin: {
-      stableId: "video2code@zcode-plugins-official",
+      stableId: "video2code@robinrun-plugins-official",
       label: {
         cn: "Video2Code",
         en: "video2code",
@@ -121,7 +121,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Check my local website for layout and interaction issues.",
     },
     plugin: {
-      stableId: "browser-use@zcode-plugins-official",
+      stableId: "browser-use@robinrun-plugins-official",
       label: {
         cn: "浏览器操作",
         en: "browser-use",
@@ -141,7 +141,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Review yesterday’s Lark work records and list today’s follow-ups.",
     },
     plugin: {
-      stableId: "lark-cli@zcode-plugins-official",
+      stableId: "lark-cli@robinrun-plugins-official",
       label: {
         cn: "飞书 CLI",
         en: "lark-cli",
@@ -161,7 +161,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Summarize attendance at my most recent Tencent Meeting.",
     },
     plugin: {
-      stableId: "tencent-meeting-cli@zcode-plugins-official",
+      stableId: "tencent-meeting-cli@robinrun-plugins-official",
       label: {
         cn: "腾讯会议 CLI",
         en: "tencent-meeting-cli",
@@ -181,7 +181,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Review today’s WeCom calendar and to-dos and organize my work.",
     },
     plugin: {
-      stableId: "wecom-cli@zcode-plugins-official",
+      stableId: "wecom-cli@robinrun-plugins-official",
       label: {
         cn: "企业微信 CLI",
         en: "wecom-cli",
@@ -201,7 +201,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Turn my notes into a clearly formatted Word document.",
     },
     plugin: {
-      stableId: "documents@zcode-plugins-official",
+      stableId: "documents@robinrun-plugins-official",
       label: {
         cn: "Word文档",
         en: "documents",
@@ -221,7 +221,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Analyze this Excel file, identify key trends and create charts.",
     },
     plugin: {
-      stableId: "spreadsheets@zcode-plugins-official",
+      stableId: "spreadsheets@robinrun-plugins-official",
       label: {
         cn: "电子表格",
         en: "spreadsheets",
@@ -241,7 +241,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Edit this long video into a one-minute highlight reel with subtitles.",
     },
     plugin: {
-      stableId: "video-agent-kit@zcode-plugins-official",
+      stableId: "video-agent-kit@robinrun-plugins-official",
       label: {
         cn: "Video Agent Kit",
         en: "video-agent-kit",
@@ -261,7 +261,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Perform due diligence on this company, focusing on relationships and business risks.",
     },
     plugin: {
-      stableId: "vet-companies@zcode-plugins-official",
+      stableId: "vet-companies@robinrun-plugins-official",
       label: {
         cn: "企业尽调",
         en: "vet-companies",
@@ -281,7 +281,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Use this income and expense data to forecast cash flow for the next 13 weeks.",
     },
     plugin: {
-      stableId: "run-fpa@zcode-plugins-official",
+      stableId: "run-fpa@robinrun-plugins-official",
       label: {
         cn: "经营分析",
         en: "run-fpa",
@@ -301,7 +301,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Summarize today’s watchlist performance and notable announcements.",
     },
     plugin: {
-      stableId: "watch-positions@zcode-plugins-official",
+      stableId: "watch-positions@robinrun-plugins-official",
       label: {
         cn: "持仓跟踪",
         en: "watch-positions",
@@ -321,7 +321,7 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
       en: "Turn my recurring workflow into a reusable skill.",
     },
     plugin: {
-      stableId: "skill-creator@zcode-plugins-official",
+      stableId: "skill-creator@robinrun-plugins-official",
       label: {
         cn: "技能创建器",
         en: "skill-creator",
@@ -333,18 +333,18 @@ export const officeSuggestedPrompts: RecommendedPrompt[] = [
     category: "utility",
     iconUrl: "https://cdn-zcode.z.ai/zcode/official-plugin/assets/zcode-guide/icon.png",
     label: {
-      cn: "帮我检查当前的 ZCode 配置，看看有哪些可以调整",
-      en: "Review my ZCode configuration and suggest useful adjustments.",
+      cn: "帮我检查当前的 RobinRun 配置，看看有哪些可以调整",
+      en: "Review my RobinRun configuration and suggest useful adjustments.",
     },
     prompt: {
-      cn: "帮我检查当前的 ZCode 配置，看看有哪些可以调整",
-      en: "Review my ZCode configuration and suggest useful adjustments.",
+      cn: "帮我检查当前的 RobinRun 配置，看看有哪些可以调整",
+      en: "Review my RobinRun configuration and suggest useful adjustments.",
     },
     plugin: {
-      stableId: "zcode-guide@zcode-plugins-official",
+      stableId: "robinrun-guide@robinrun-plugins-official",
       label: {
-        cn: "ZCode 使用指南",
-        en: "zcode-guide",
+        cn: "RobinRun 使用指南",
+        en: "robinrun-guide",
       },
     },
   },

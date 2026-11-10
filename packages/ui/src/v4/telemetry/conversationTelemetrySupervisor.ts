@@ -2,8 +2,8 @@ import {
   ConversationTelemetryEngine,
   type TelemetryPlatform,
   type ConversationTelemetryObservation,
-} from "@zcode/shared/conversation-telemetry";
-export * from "@zcode/shared/conversation-telemetry";
+} from "@robinrun/shared/conversation-telemetry";
+export * from "@robinrun/shared/conversation-telemetry";
 import { reportAppTelemetryEvent } from "@/lib/appTelemetry.js";
 import {
   reportChatErrorBannerTelemetry,
@@ -27,7 +27,7 @@ import {
   reportUiToolCallDetail,
   reportUiTurnBreakdown,
 } from "@/lib/uiPerfArmsTelemetry.js";
-import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
+import type { RobinRunUiError } from "@/lib/robinrunUiError.js";
 
 const observers = {
   reportSendFunnelInputFocus: (args: readonly unknown[]) =>
@@ -81,7 +81,7 @@ export class ConversationTelemetrySupervisor extends ConversationTelemetryEngine
     surface?: ChatErrorBannerSurface;
     errorKey?: string | null;
     displayMessage: string;
-    error: ZCodeUiError;
+    error: RobinRunUiError;
   }): void {
     if (this.uiDisposed) return;
     void reportChatErrorBannerTelemetry(this.uiPlatform, {

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { rename, rm, writeFile } from "node:fs/promises";
-import type { SourceServerReleaseArchive, SourceServerReleaseDescriptor } from "@zcode/shared";
-import { normalizeRemoteArch, normalizeRemotePlatform } from "@zcode/server/remote/detectEnv.js";
+import type { SourceServerReleaseArchive, SourceServerReleaseDescriptor } from "@robinrun/shared";
+import { normalizeRemoteArch, normalizeRemotePlatform } from "@robinrun/server/remote/detectEnv.js";
 
 export function selectSourceServerReleaseArchive(
   descriptor: SourceServerReleaseDescriptor,

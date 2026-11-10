@@ -1,7 +1,7 @@
 import type {
   SettingsSyncAgent,
   SettingsSyncCategory,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 
 export interface SettingsSyncSourceItem {
   id: string;

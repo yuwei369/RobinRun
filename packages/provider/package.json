@@ -1,5 +1,5 @@
 {
-  "name": "@zcode/provider",
+  "name": "@robinrun/provider",
   "private": true,
   "type": "module",
   "exports": {
@@ -11,8 +11,8 @@
     "lint": "oxlint"
   },
   "dependencies": {
-    "@zcode/model-option-map": "workspace:*",
-    "@zcode/shared": "workspace:*",
+    "@robinrun/model-option-map": "workspace:*",
+    "@robinrun/shared": "workspace:*",
     "zod": "4.6.5"
   },
   "devDependencies": {

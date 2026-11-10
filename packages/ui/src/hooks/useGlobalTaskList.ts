@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type {
   WindowHostControllerTaskListItem,
-  ZCodeTaskListQuery,
-  ZCodeTaskListWorkspaceScope,
-} from "@zcode/services";
+  RobinRunTaskListQuery,
+  RobinRunTaskListWorkspaceScope,
+} from "@robinrun/services";
 import { logger } from "@/logger.js";
 import { useBaseWorkspaceServices } from "@/hooks/useWorkspaceServices.js";
 import type { WorkspaceTabState } from "@/store/tabStore.js";
-import { selectWorkspaceZCodeState, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
+import { selectWorkspaceRobinRunState, useRobinRunSessionStore } from "@/store/robinrunSessionStore.js";
 import { attachTaskListRowActivity } from "@/v4/taskListRowActivity.js";
 import { stabilizeTaskListItems } from "@/v4/taskListItemStabilization.js";
 import { getWindowControllerTaskListRegistry } from "@/v4/windowControllerTaskListRegistry.js";
@@ -18,8 +18,8 @@ type GlobalTaskListItem = WindowHostControllerTaskListItem;
 const subscribeToNothing = () => () => {};
 const zeroRevision = () => 0;
 
-function buildWorkspaceScopes(workspaceTabs: WorkspaceTabState[]): ZCodeTaskListWorkspaceScope[] {
-  const scopes = new Map<string, ZCodeTaskListWorkspaceScope>();
+function buildWorkspaceScopes(workspaceTabs: WorkspaceTabState[]): RobinRunTaskListWorkspaceScope[] {
+  const scopes = new Map<string, RobinRunTaskListWorkspaceScope>();
   for (const tab of workspaceTabs) {
     const scope = {
       workspacePath: tab.workspacePath,
@@ -34,7 +34,7 @@ function buildWorkspaceScopes(workspaceTabs: WorkspaceTabState[]): ZCodeTaskList
 }
 
 export function useGlobalTaskList(params: {
-  kind: ZCodeTaskListQuery["kind"];
+  kind: RobinRunTaskListQuery["kind"];
   scope?: "host";
   enabled?: boolean;
   workspaceTabs: WorkspaceTabState[];
@@ -92,11 +92,11 @@ export function useGlobalTaskList(params: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [workspaceSignature, params.scope],
   );
-  const taskListVersionSignature = useZCodeSessionStore((state) =>
+  const taskListVersionSignature = useRobinRunSessionStore((state) =>
     JSON.stringify(
       params.workspaceTabs
         .map((tab) => {
-          const workspace = selectWorkspaceZCodeState(
+          const workspace = selectWorkspaceRobinRunState(
             state,
             tab.workspacePath,
             tab.workspaceIdentity,

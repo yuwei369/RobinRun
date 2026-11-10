@@ -11,7 +11,7 @@ import {
   type WebRemoteControlContext,
   type WebRemoteControlStartResult,
   type WebRemoteControlStatus,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 import type { WebRemoteControlStartAuthorization } from "./webRemoteControlManager.js";
 
 export interface WebRemoteControlIpcManager {

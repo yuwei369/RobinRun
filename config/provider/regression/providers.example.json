@@ -1,5 +1,5 @@
 {
-  "builtinFile": "../zcode-builtin.json",
+  "builtinFile": "../robinrun-builtin.json",
   "providerRules": [
     {
       "providerId": "test-minimax-api",

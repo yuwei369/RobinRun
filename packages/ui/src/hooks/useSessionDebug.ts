@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { SessionDebugSnapshot } from "@zcode/shared";
+import type { SessionDebugSnapshot } from "@robinrun/shared";
 import { useServices } from "@/hooks/useServices.js";
 
 const REFRESH_INTERVAL_MS = 1000;
@@ -16,11 +16,11 @@ export function useSessionDebug({
   taskId: string | null;
   enabled?: boolean;
 }) {
-  const { zcodeAgentService } = useServices();
+  const { robinrunAgentService } = useServices();
   const scopeKey = JSON.stringify([workspaceIdentity?.trim() || workspacePath, taskId]);
   const [result, setResult] = useState<{
     key: string;
-    service: typeof zcodeAgentService;
+    service: typeof robinrunAgentService;
     data: SessionDebugSnapshot | null;
     error: boolean;
   } | null>(null);
@@ -30,19 +30,19 @@ export function useSessionDebug({
     let timer: ReturnType<typeof setTimeout> | undefined;
     const refresh = async () => {
       try {
-        const data = await zcodeAgentService.readSessionDebug({
+        const data = await robinrunAgentService.readSessionDebug({
           workspacePath,
           workspaceIdentity,
           sessionId: taskId,
         });
-        if (!disposed) setResult({ key: scopeKey, service: zcodeAgentService, data, error: false });
+        if (!disposed) setResult({ key: scopeKey, service: robinrunAgentService, data, error: false });
       } catch {
         if (!disposed)
           setResult((previous) => ({
             key: scopeKey,
-            service: zcodeAgentService,
+            service: robinrunAgentService,
             data:
-              previous?.key === scopeKey && previous.service === zcodeAgentService
+              previous?.key === scopeKey && previous.service === robinrunAgentService
                 ? previous.data
                 : null,
             error: true,
@@ -57,7 +57,7 @@ export function useSessionDebug({
       disposed = true;
       clearTimeout(timer);
     };
-  }, [enabled, scopeKey, taskId, workspaceIdentity, workspacePath, zcodeAgentService]);
-  const current = result?.key === scopeKey && result.service === zcodeAgentService ? result : null;
+  }, [enabled, scopeKey, taskId, workspaceIdentity, workspacePath, robinrunAgentService]);
+  const current = result?.key === scopeKey && result.service === robinrunAgentService ? result : null;
   return { ...(current?.data ?? EMPTY_DEBUG), error: current?.error ?? false };
 }

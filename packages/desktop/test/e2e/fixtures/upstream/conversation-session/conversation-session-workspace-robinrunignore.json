@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "caseName": "conversation-session-workspace-robinrunignore",
+  "spec": "./test/e2e/conversation-session/conversation-session-workspace-robinrunignore.test.ts",
+  "fixtures": []
+}

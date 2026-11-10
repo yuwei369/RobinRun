@@ -28,7 +28,7 @@ import {
 } from "../helpers/v4-conversation.js";
 
 // 官方文档插件已拆分；旧 document-skills:judge 不在当前目录，不能验证模型覆盖。
-const AGENT_ID = "plugin:documents@zcode-plugins-official:visual-judge";
+const AGENT_ID = "plugin:documents@robinrun-plugins-official:visual-judge";
 const PARENT = "E2E_PLUGIN_OVERRIDE_COLD_PARENT";
 const CHILD = "E2E_PLUGIN_OVERRIDE_COLD_CHILD";
 const RESULT = "E2E_PLUGIN_OVERRIDE_COLD_RESULT";

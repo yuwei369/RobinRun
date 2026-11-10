@@ -11,9 +11,9 @@ import {
   IOnboardingRecordService,
   ICredentialService,
   IBroadcastService,
-  IZCodeTaskService,
-  IZCodeAgentService,
-  IZCodeSessionService,
+  IRobinRunTaskService,
+  IRobinRunAgentService,
+  IRobinRunSessionService,
   IConversationShareService,
   createUnsupportedConversationShareService,
   IBotsService,
@@ -45,7 +45,7 @@ import {
   IPromptAttachmentTransferService,
   type ServiceDescriptor,
   type IServiceAccessor,
-} from "@zcode/services";
+} from "@robinrun/services";
 import {
   REMOTE_WORKSPACE_RPC_CHANNELS,
   assertRemoteWorkspaceRpcContract,
@@ -54,12 +54,12 @@ import {
   createServiceLogger,
   createLegacySingleRootProjectService,
   createRemoteProjectService,
-} from "@zcode/services/node";
+} from "@robinrun/services/node";
 import {
   buildServerRemoteWorkspaceIdentity,
   remoteHostIdFromWorkspaceIdentity,
-} from "@zcode/shared";
-import type { RemoteTarget } from "@zcode/shared";
+} from "@robinrun/shared";
+import type { RemoteTarget } from "@robinrun/shared";
 import {
   createRemoteProviderProvisioningExecutorFromWorkspace,
   registerRemoteProviderProvisioningExecutor,
@@ -77,9 +77,9 @@ export const REMOTE_WORKSPACE_RPC_REGISTRATIONS = [
   ["onboardingRecordService", IOnboardingRecordService],
   ["credentialService", ICredentialService],
   ["broadcastService", IBroadcastService],
-  ["zcodeTaskService", IZCodeTaskService],
-  ["zcodeAgentService", IZCodeAgentService],
-  ["zcodeSessionService", IZCodeSessionService],
+  ["robinrunTaskService", IRobinRunTaskService],
+  ["robinrunAgentService", IRobinRunAgentService],
+  ["robinrunSessionService", IRobinRunSessionService],
   ["conversationShareService", IConversationShareService],
   ["botsService", IBotsService],
   ["fileWatcherService", IFileWatcherService],
@@ -162,7 +162,7 @@ export function resolveServerProjectService(params: {
         );
     },
     readTasks: ({ workspacePath, kind }) => {
-      const tasks = params.connectionServices.zcodeTaskService;
+      const tasks = params.connectionServices.robinrunTaskService;
       const scope = { workspacePath };
       return kind === "pinned"
         ? tasks.listPinnedTasks(scope)
@@ -185,7 +185,7 @@ export function createServerRemoteWorkspaceServiceCollection(params: {
   sourceServices?: ServiceCollection;
 }): ServiceCollection {
   assertRemoteWorkspaceRpcContract(params.connectionServices);
-  // Server remote 连接的是一个已经运行的完整 ZCode server。
+  // Server remote 连接的是一个已经运行的完整 RobinRun server。
   // Host 只做 RPC 转接，不替 server 决定 workspace/runtime/provider 归属；
   // Provider 配置只经 Host 私有的 Provisioning executor 从本机单向下发到远端。
   const remoteProviderProvisioningExecutor =
@@ -206,9 +206,9 @@ export function createServerRemoteWorkspaceServiceCollection(params: {
     .register(IOnboardingRecordService, params.connectionServices.onboardingRecordService)
     .register(ICredentialService, params.connectionServices.credentialService)
     .register(IBroadcastService, params.connectionServices.broadcastService)
-    .register(IZCodeTaskService, params.connectionServices.zcodeTaskService)
-    .register(IZCodeAgentService, params.connectionServices.zcodeAgentService)
-    .register(IZCodeSessionService, params.connectionServices.zcodeSessionService)
+    .register(IRobinRunTaskService, params.connectionServices.robinrunTaskService)
+    .register(IRobinRunAgentService, params.connectionServices.robinrunAgentService)
+    .register(IRobinRunSessionService, params.connectionServices.robinrunSessionService)
     // R3 的分享属于目标 Environment；不能恢复旧 SSH 的本机 JWT 混装。
     .register(
       IConversationShareService,

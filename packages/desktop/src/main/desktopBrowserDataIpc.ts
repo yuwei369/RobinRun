@@ -3,7 +3,7 @@ import {
   PlatformChannels,
   type ChromeBrowserDataImportOptions,
   type EmbeddedBrowserSitePermissionUpdateRequest,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 import {
   clearEmbeddedBrowserData,
   importChromeBrowserData,

@@ -5,11 +5,11 @@ import type {
   SettingsSyncDiscoveryResult,
   SettingsSyncImportResult,
   SettingsSyncSelection,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 import { logger } from "@/logger.js";
 import { useServices } from "@/hooks/useServices.js";
-import { useZCodeSessionService } from "@/hooks/useZCodeSessionService.js";
-import { invalidateDeferredDraftSessionForSkillChange } from "@/lib/zcodeDraftSkillInvalidation.js";
+import { useRobinRunSessionService } from "@/hooks/useRobinRunSessionService.js";
+import { invalidateDeferredDraftSessionForSkillChange } from "@/lib/robinrunDraftSkillInvalidation.js";
 import type { SettingsSyncUiState, SettingsSyncUiTask } from "@/settings-sync/types.js";
 
 const IMPORTING_TASK_DELAY_MS = 320;
@@ -201,7 +201,7 @@ function applyTaskResults(
 
 export function useSettingsSync(params: { workspacePath?: string; workspaceIdentity?: string }) {
   const { settingsSyncService } = useServices();
-  const zcodeSessionService = useZCodeSessionService(
+  const robinrunSessionService = useRobinRunSessionService(
     params.workspacePath,
     undefined,
     params.workspaceIdentity,
@@ -595,7 +595,7 @@ export function useSettingsSync(params: { workspacePath?: string; workspaceIdent
       params.workspaceIdentity,
       params.workspacePath,
       settingsSyncService,
-      zcodeSessionService,
+      robinrunSessionService,
       state.discovery,
       state.selectedKeys,
     ],

@@ -2,7 +2,7 @@ import {
   InternalChannels,
   scopedServicePortPayloadSchema,
   type ScopedServicePortPayload,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 
 export type RemoteWorkspaceServicePortRegistration = ScopedServicePortPayload & {
   port: MessagePort;

@@ -1,5 +1,5 @@
-import type { StorageRootSpec } from "@zcode/services";
-import type { StorageScanProgress } from "@zcode/services/node";
+import type { StorageRootSpec } from "@robinrun/services";
+import type { StorageScanProgress } from "@robinrun/services/node";
 
 export interface StorageScanWorkerData {
   roots: StorageRootSpec[];

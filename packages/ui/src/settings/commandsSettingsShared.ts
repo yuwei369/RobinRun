@@ -1,25 +1,25 @@
 import {
-  ZCODE_AGENT_PROVIDER,
-  ZCODE_COMMAND_AGENT_SOURCES,
-  type ZCodeProvider,
+  ROBINRUN_AGENT_PROVIDER,
+  ROBINRUN_COMMAND_AGENT_SOURCES,
+  type RobinRunProvider,
   type CommandAgentSource,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 
 export const COMMAND_AGENT_SOURCES = [
-  ...ZCODE_COMMAND_AGENT_SOURCES,
+  ...ROBINRUN_COMMAND_AGENT_SOURCES,
 ] as const satisfies readonly CommandAgentSource[];
 
 export const COMMAND_AGENT_SOURCE_META: Record<
   CommandAgentSource,
   {
     labelId: string;
-    provider: ZCodeProvider;
+    provider: RobinRunProvider;
     pathHint: string;
   }
 > = {
-  zcodeAgent: {
-    labelId: "settings.commands.source.zcodeAgent",
-    pathHint: "~/.zcode/commands",
-    provider: ZCODE_AGENT_PROVIDER,
+  robinrunAgent: {
+    labelId: "settings.commands.source.robinrunAgent",
+    pathHint: "~/.robinrun/commands",
+    provider: ROBINRUN_AGENT_PROVIDER,
   },
 };

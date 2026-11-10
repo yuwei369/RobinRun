@@ -1,6 +1,6 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { TID_V4_COMPOSER_INPUT } from "@zcode/shared/test-ids";
+import { TID_V4_COMPOSER_INPUT } from "@robinrun/shared/test-ids";
 import { DEFAULT_WORKSPACE } from "../helpers/desktop-app.js";
 import { prepareV4ConversationE2E } from "#e2e/helpers/v4-conversation";
 import { startDraftFromProject } from "#e2e/helpers/project-sidebar";
@@ -112,7 +112,7 @@ describe("会话区 Composer 前缀提示路由 E2E", () => {
     assertPanelExcludesSections(atPluginPanel, ["commands", "subagents", "skills"]);
     await browser.keys("Enter");
     await waitForComposerMarkdownContaining(
-      "plugin://skill-creator@zcode-plugins-official",
+      "plugin://skill-creator@robinrun-plugins-official",
       "@ plugin 候选 Enter 后没有写入 canonical plugin mention markdown",
     );
 
@@ -188,15 +188,15 @@ async function seedPromptCatalogFiles(seed: {
 }) {
   const files: Array<[string, string]> = [
     [
-      join(DEFAULT_WORKSPACE, ".zcode", "commands", `${seed.commandName}.md`),
+      join(DEFAULT_WORKSPACE, ".robinrun", "commands", `${seed.commandName}.md`),
       `---\ndescription: E2E prefix command\nargument-hint: [topic]\n---\nPrefix fixture $ARGUMENTS.\n`,
     ],
     [
-      join(DEFAULT_WORKSPACE, ".zcode", "skills", seed.skillName, "SKILL.md"),
+      join(DEFAULT_WORKSPACE, ".robinrun", "skills", seed.skillName, "SKILL.md"),
       `---\nname: ${seed.skillName}\ndescription: E2E prefix skill\n---\nUse only for prefix routing.\n`,
     ],
     [
-      join(DEFAULT_WORKSPACE, ".zcode", "agents", `${seed.subagentName}.md`),
+      join(DEFAULT_WORKSPACE, ".robinrun", "agents", `${seed.subagentName}.md`),
       `---\nname: ${seed.subagentName}\ndescription: E2E prefix subagent\ntools: Read\n---\nUse only for prefix routing.\n`,
     ],
   ];
@@ -239,13 +239,13 @@ async function setComposerText(text: string) {
         (inputTestId, nextText) => {
           const input = document.querySelector<HTMLElement>(`[data-testid="${inputTestId}"]`) as
             | (HTMLElement & {
-                __zcodeLexicalInputE2E?: {
+                __robinrunLexicalInputE2E?: {
                   focus: () => void;
                   setText: (value: string) => void;
                 };
               })
             | null;
-          const bridge = input?.__zcodeLexicalInputE2E;
+          const bridge = input?.__robinrunLexicalInputE2E;
           if (!bridge) {
             return false;
           }
@@ -363,9 +363,9 @@ function getComposerMarkdown(): Promise<string> {
   return browser.execute((inputTestId) => {
     const input = document.querySelector<HTMLElement>(`[data-testid="${inputTestId}"]`) as
       | (HTMLElement & {
-          __zcodeLexicalInputE2E?: { getText: () => string };
+          __robinrunLexicalInputE2E?: { getText: () => string };
         })
       | null;
-    return input?.__zcodeLexicalInputE2E?.getText() ?? "";
+    return input?.__robinrunLexicalInputE2E?.getText() ?? "";
   }, TID_V4_COMPOSER_INPUT);
 }

@@ -1,27 +1,27 @@
-import { migrateApplicationStorage, createSettingService } from "@zcode/services/node";
-import { disposeServiceResourcesAndWait, getAppConfigDir } from "@zcode/services/node";
-import type { IChannel } from "@zcode/rpc";
+import { migrateApplicationStorage, createSettingService } from "@robinrun/services/node";
+import { disposeServiceResourcesAndWait, getAppConfigDir } from "@robinrun/services/node";
+import type { IChannel } from "@robinrun/rpc";
 import {
-  ZCODE_VERSION,
+  ROBINRUN_VERSION,
   TOPIC_RESOURCE_RELAY_CHANNEL,
   SERVICE_AUTHORITY_MODE_ENV,
   formatLogPrefix,
   formatZodError,
   helloAckMessageSchema,
-} from "@zcode/shared";
-import type { HelloMessage, HelloAckMessage } from "@zcode/shared";
+} from "@robinrun/shared";
+import type { HelloMessage, HelloAckMessage } from "@robinrun/shared";
 import { createStdioServer } from "./stdio.js";
 import { registerStdioProcessLifecycle } from "./stdio-lifecycle.js";
 import { createStdioServices } from "./stdioServices.js";
 import { ensureRemoteServerDeviceMid } from "./stdioDeviceMid.js";
 import {
-  materializeBundledZCodeBuiltinProviderConfig,
-  readBundledZCodeBuiltinProviderConfig,
-} from "./bundledZCodeBuiltinProviderConfig.js";
+  materializeBundledRobinRunBuiltinProviderConfig,
+  readBundledRobinRunBuiltinProviderConfig,
+} from "./bundledRobinRunBuiltinProviderConfig.js";
 
 // In stdio mode, all logging goes to stderr
 const log = (...args: unknown[]) =>
-  console.error(formatLogPrefix("zcode-server:stdio", process.pid), ...args);
+  console.error(formatLogPrefix("robinrun-server:stdio", process.pid), ...args);
 const stderrConsoleLog = (...args: unknown[]) => console.error(...args);
 
 // stdio 模式下 stdout 只能承载 RPC 帧。
@@ -35,15 +35,15 @@ console.debug = stderrConsoleLog;
 
 // --version flag: print version and exit (used by deploy version check)
 if (process.argv.includes("--version")) {
-  process.stdout.write(ZCODE_VERSION + "\n");
+  process.stdout.write(ROBINRUN_VERSION + "\n");
   process.exit(0);
 }
 
 async function main() {
   // Phase 1: Send hello message
   const hello: HelloMessage = {
-    type: "zcode-hello",
-    version: ZCODE_VERSION,
+    type: "robinrun-hello",
+    version: ROBINRUN_VERSION,
     platform: process.platform,
     arch: process.arch,
     pid: process.pid,
@@ -54,21 +54,21 @@ async function main() {
   const ack = await waitForAck();
   log(`client connected: ${ack.clientId} (v${ack.version})`);
 
-  // 远端主机没有 Desktop main，没人写 telemetry-state.json，services 发往 ZCode endpoint
+  // 远端主机没有 Desktop main，没人写 telemetry-state.json，services 发往 RobinRun endpoint
   // 的请求缺 X-Device-Mid，Start Plan 的 billing/balance 被拒。远端 server 是本机设备身份的
   // 生命周期所有者，必须在 services 创建前确保 deviceMid 存在（详见 stdioDeviceMid.ts）。
   await ensureRemoteServerDeviceMid({ log });
 
   // Phase 3: Initialize services and start stdio RPC server
   let topicResourceChannel: IChannel | undefined;
-  const zcodeBuiltinProviderConfigFilePath = await materializeBundledZCodeBuiltinProviderConfig({
+  const robinrunBuiltinProviderConfigFilePath = await materializeBundledRobinRunBuiltinProviderConfig({
     environmentConfigRoot: getAppConfigDir(),
-    content: readBundledZCodeBuiltinProviderConfig(),
+    content: readBundledRobinRunBuiltinProviderConfig(),
   });
   await migrateApplicationStorage(await createSettingService().get());
   const { authorityModeParseResult, services } = createStdioServices({
     env: process.env,
-    zcodeBuiltinProviderConfigFilePath,
+    robinrunBuiltinProviderConfigFilePath,
     topicResourceRelayChannel: () => {
       if (!topicResourceChannel) throw new Error("Desktop topic resource channel is unavailable");
       return topicResourceChannel;

@@ -3,8 +3,8 @@ import { existsSync } from "node:fs";
 import { cp, lstat, mkdir, readFile, readdir, rm } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { dirname, isAbsolute, join, resolve } from "node:path";
-import type { PluginSyncMarketplaceMirrorInspection } from "@zcode/shared";
-import { PLUGIN_DATA_SYNC_MAX_ITEM_BYTES } from "@zcode/shared";
+import type { PluginSyncMarketplaceMirrorInspection } from "@robinrun/shared";
+import { PLUGIN_DATA_SYNC_MAX_ITEM_BYTES } from "@robinrun/shared";
 import type { IPluginSyncService } from "./pluginSync.js";
 import {
   createPluginSyncArchive,
@@ -61,7 +61,7 @@ const DEFAULT_MAX_ARCHIVE_BYTES = PLUGIN_DATA_SYNC_MAX_ITEM_BYTES;
 const MARKETPLACE_SOURCE_ROOT_DIRECTORY = "marketplace-sources";
 const MIRRORED_MARKETPLACE_PLUGIN_ROOT = "plugins";
 const PLUGIN_MANIFEST_RELATIVE_PATHS = [
-  [".zcode-plugin", "plugin.json"],
+  [".robinrun-plugin", "plugin.json"],
   [".claude-plugin", "plugin.json"],
   [".codex-plugin", "plugin.json"],
 ] as const;
@@ -116,12 +116,12 @@ export function resolveUserHomeDir(): string {
   return process.env.HOME?.trim() || process.env.USERPROFILE?.trim() || homedir();
 }
 
-export function getUserZcodeConfigPath(): string {
-  return join(resolveUserHomeDir(), ".zcode", "cli", "config.json");
+export function getUserRobinrunConfigPath(): string {
+  return join(resolveUserHomeDir(), ".robinrun", "cli", "config.json");
 }
 
-export function getUserZcodePluginRoot(): string {
-  return join(resolveUserHomeDir(), ".zcode", "plugins");
+export function getUserRobinrunPluginRoot(): string {
+  return join(resolveUserHomeDir(), ".robinrun", "plugins");
 }
 
 async function exportMarketplaceSourceArchiveInternal(
@@ -218,7 +218,7 @@ async function importMarketplaceSourceArchiveInternal(
   archive: Uint8Array,
   maxArchiveBytes: number,
 ) {
-  const tempRoot = join(tmpdir(), `zcode-plugin-marketplace-source-${randomUUID()}`);
+  const tempRoot = join(tmpdir(), `robinrun-plugin-marketplace-source-${randomUUID()}`);
   try {
     await extractPluginSyncArchive(archive, tempRoot, {
       maxExtractedBytes: maxArchiveBytes,
@@ -232,7 +232,7 @@ async function importMarketplaceSourceArchiveInternal(
         `marketplace source archive id mismatch: ${manifest.name} !== ${metadata.marketplaceId}`,
       );
     }
-    const targetRoot = join(getUserZcodePluginRoot(), MARKETPLACE_SOURCE_ROOT_DIRECTORY);
+    const targetRoot = join(getUserRobinrunPluginRoot(), MARKETPLACE_SOURCE_ROOT_DIRECTORY);
     const targetPath = resolvePluginSyncPathWithin(targetRoot, directoryName);
     if (existsSync(targetPath)) {
       return {
@@ -258,7 +258,7 @@ async function importMarketplaceSourceArchiveInternal(
 }
 
 export async function readUserPluginConfigState(): Promise<UserPluginConfigState> {
-  const parsed = await readJsonFileOrEmpty(getUserZcodeConfigPath());
+  const parsed = await readJsonFileOrEmpty(getUserRobinrunConfigPath());
   const plugins = isRecord(parsed.plugins) ? parsed.plugins : {};
   const enabledPlugins = isRecord(plugins.enabledPlugins) ? plugins.enabledPlugins : {};
   const enabledOverrides = new Map<string, boolean>();

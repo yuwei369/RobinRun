@@ -7,19 +7,19 @@ import {
   type ShareWorkflowPayload,
   type ShareWorkflowArtifact,
   type ConversationShareCapabilities,
-} from "@zcode/shared";
+} from "@robinrun/shared";
 import {
   reduceWorkflowRunsState,
   type ConversationRow,
   type ArtifactRow,
   type WorkflowRunsState,
   type ToolCallCreateWorkflowCausalityGraph,
-} from "@zcode/shared/zcode-protocol-v4";
-import type { IZCodeAgentService } from "../zcode-agent/zcodeAgent.js";
+} from "@robinrun/shared/robinrun-protocol-v4";
+import type { IRobinRunAgentService } from "../robinrun-agent/robinrunAgent.js";
 import type { PublishTextConversationInput } from "./conversationShare.js";
 
 export type ShareWorkflowReader = Pick<
-  IZCodeAgentService,
+  IRobinRunAgentService,
   | "conversationWorkflowRunsV4"
   | "conversationWorkflowRunEventsV4"
   | "conversationWorkflowRunArtifactsV4"

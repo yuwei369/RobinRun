@@ -14,8 +14,8 @@ export function installOfflineChecks() {
         callback({ cancel: true });
       },
     );
-    session.webRequest.onCompleted({ urls: ["zcode-sandbox://*/*"] }, (details) => {
-      if (details.url.includes("/__zcode__/vendor/")) localScripts.add(details.url);
+    session.webRequest.onCompleted({ urls: ["robinrun-sandbox://*/*"] }, (details) => {
+      if (details.url.includes("/__robinrun__/vendor/")) localScripts.add(details.url);
     });
   });
   return {

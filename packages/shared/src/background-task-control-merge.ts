@@ -1,9 +1,9 @@
-import type { ZCodeBackgroundTaskControlItem } from "./background-task-controls.js";
+import type { RobinRunBackgroundTaskControlItem } from "./background-task-controls.js";
 
-export function mergeZCodeBackgroundTaskControlItems(
-  current: readonly ZCodeBackgroundTaskControlItem[],
-  updates: readonly ZCodeBackgroundTaskControlItem[],
-): ZCodeBackgroundTaskControlItem[] {
+export function mergeRobinRunBackgroundTaskControlItems(
+  current: readonly RobinRunBackgroundTaskControlItem[],
+  updates: readonly RobinRunBackgroundTaskControlItem[],
+): RobinRunBackgroundTaskControlItem[] {
   const jobsById = new Map(current.map((job) => [job.jobId, job] as const));
   for (const job of updates) {
     jobsById.set(job.jobId, job);

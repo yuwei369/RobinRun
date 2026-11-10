@@ -1,6 +1,6 @@
 /* oxlint-disable eslint(max-lines) -- Resolver 同时产出 Settings 分层结果与唯一 Registry 完整类型证明。 */
 import type { z } from "zod";
-import type { completeModelConfigDataSchema } from "@zcode/shared/model-config";
+import type { completeModelConfigDataSchema } from "@robinrun/shared/model-config";
 import type {
   completeApiKeyAccessDataSchema,
   completeZhipuAccountAccessDataSchema,
@@ -126,10 +126,10 @@ export function createRegistryModelConfig(
 }
 
 export interface ProviderConfigResolverInput {
-  readonly zcodeBuiltinProviders: ProviderConfigMap;
-  readonly zcodeBuiltinProviderTemplates?: ProviderTemplateMap;
+  readonly robinrunBuiltinProviders: ProviderConfigMap;
+  readonly robinrunBuiltinProviderTemplates?: ProviderTemplateMap;
   readonly personalProviders: ProviderConfigMap;
-  readonly zcodeBuiltinModelRules: ModelConfigRules;
+  readonly robinrunBuiltinModelRules: ModelConfigRules;
   readonly personalModels: ModelConfigRules;
   readonly accountProviders: ProviderConfigMap;
   readonly accountStates?: AccountProviderStates;
@@ -184,11 +184,11 @@ export class ProviderConfigResolver {
     const accountProviders = new ProviderConfigMap(
       input.accountProviders
         .entries()
-        .filter(([providerId]) => input.zcodeBuiltinProviders.has(providerId))
+        .filter(([providerId]) => input.robinrunBuiltinProviders.has(providerId))
         .map(([providerId, config]) => [providerId, config.withoutGroup()] as const),
     );
-    const concreteBuiltinProviders = input.zcodeBuiltinProviders.overlay(accountProviders);
-    const providerTemplates = input.zcodeBuiltinProviderTemplates;
+    const concreteBuiltinProviders = input.robinrunBuiltinProviders.overlay(accountProviders);
+    const providerTemplates = input.robinrunBuiltinProviderTemplates;
     const effectiveBuiltinProviders = concreteBuiltinProviders.mapConfigs((concrete, _id, rule) => {
       const template = rule.templateId
         ? providerTemplates?.get(rule.templateId)?.config
@@ -228,7 +228,7 @@ export class ProviderConfigResolver {
         return logo ? config.overlay(new ProviderConfig({ logo })) : config;
       });
     const effectiveModelRules = ModelConfigRules.composeEffective(
-      input.zcodeBuiltinModelRules,
+      input.robinrunBuiltinModelRules,
       input.personalModels,
     );
     const issues: ConfigValidationIssue[] = [];
@@ -282,7 +282,7 @@ export class ProviderConfigResolver {
           apiType: config.api?.type,
           baseUrl: config.api?.baseUrl,
         });
-        const effectiveBuiltinConfig = input.zcodeBuiltinModelRules.resolve({
+        const effectiveBuiltinConfig = input.robinrunBuiltinModelRules.resolve({
           providerId,
           templateId,
           modelId,
@@ -383,7 +383,7 @@ function resolveProviderOrder(
     return group === "zai-family" || group === "bigmodel-family";
   });
   const familySet = new Set(familyIds);
-  const builtinIds = input.zcodeBuiltinProviders
+  const builtinIds = input.robinrunBuiltinProviders
     .keys()
     .filter((providerId) => !familySet.has(providerId));
   const builtinSet = new Set(builtinIds);

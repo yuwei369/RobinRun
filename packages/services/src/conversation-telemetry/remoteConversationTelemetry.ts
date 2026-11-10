@@ -1,11 +1,11 @@
 import {
-  ZCODE_AGENT_PROVIDER,
+  ROBINRUN_AGENT_PROVIDER,
   sanitizeTelemetryEventDetail,
   type TelemetryEventPayload,
-} from "@zcode/shared";
-import { ConversationTelemetryEngine } from "@zcode/shared/conversation-telemetry";
-import { buildPromptTelemetryExtraDetail } from "@zcode/shared/conversation-telemetry/messageTelemetry";
-import type { ConversationTelemetryFact } from "@zcode/shared/zcode-protocol-v4";
+} from "@robinrun/shared";
+import { ConversationTelemetryEngine } from "@robinrun/shared/conversation-telemetry";
+import { buildPromptTelemetryExtraDetail } from "@robinrun/shared/conversation-telemetry/messageTelemetry";
+import type { ConversationTelemetryFact } from "@robinrun/shared/robinrun-protocol-v4";
 
 /** 只消费执行服务的 live facts，不依赖手机 attachment 或桌面 pane 的寿命。 */
 export class RemoteConversationTelemetry {
@@ -74,7 +74,7 @@ export class RemoteConversationTelemetry {
             memoryEnabled: fact.memoryEnabled,
             extraDetail: {
               ...buildPromptTelemetryExtraDetail({
-                provider: ZCODE_AGENT_PROVIDER,
+                provider: ROBINRUN_AGENT_PROVIDER,
                 modelName: fact.modelName,
               }),
               ...(fact.modelProvider ? { model_provider: fact.modelProvider } : {}),

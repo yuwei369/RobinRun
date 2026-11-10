@@ -3,16 +3,16 @@ import type {
   McpServerConfig,
   McpSource,
   NativeMcpServerRecord,
-  ZCodeMcpServer,
-} from "@zcode/shared";
+  RobinRunMcpServer,
+} from "@robinrun/shared";
 
-export const MCP_CONFIG_KEY = "zcode-mcp-config";
-export const MCP_ENABLED_STATES_KEY = "zcode-mcp-enabled-states";
-export const MCP_DELETED_PRELOAD_KEY = "zcode-mcp-deleted-preload";
+export const MCP_CONFIG_KEY = "robinrun-mcp-config";
+export const MCP_ENABLED_STATES_KEY = "robinrun-mcp-enabled-states";
+export const MCP_DELETED_PRELOAD_KEY = "robinrun-mcp-deleted-preload";
 
 export const DEFAULT_MCP_CONFIG: McpConfig = {
   mcp: { mcpServers: {} },
-  zcodeagentmcp: { mcpServers: {}, projects: {} },
+  robinrunagentmcp: { mcpServers: {}, projects: {} },
   claudeclimcp: { mcpServers: {}, projects: {} },
   geminiclimcp: { mcpServers: {}, projects: {} },
   codexclimcp: { mcpServers: {}, projects: {} },
@@ -88,7 +88,7 @@ function toIdKey(value: string): string {
 }
 
 export function makeServerId(source: McpSource, name: string, projectPath?: string, directorySource?: NonNullable<NativeMcpServerRecord["location"]>["source"]): string {
-  const sourceKey = source === "zcodeagentmcp" && directorySource && directorySource !== "zcode"
+  const sourceKey = source === "robinrunagentmcp" && directorySource && directorySource !== "robinrun"
     ? `${source}-${directorySource}`
     : source;
   return `${sourceKey}-${toIdKey(toScopeKey(projectPath))}-${toIdKey(name)}`;
@@ -99,8 +99,8 @@ export function buildServerList(
   nativeServers: NativeMcpServerRecord[],
   enabledStates: Record<string, boolean>,
   deletedPreload: Set<string>,
-  existingServers: ZCodeMcpServer[],
-): ZCodeMcpServer[] {
+  existingServers: RobinRunMcpServer[],
+): RobinRunMcpServer[] {
   const existingById = new Map(existingServers.map((s) => [s.id, s]));
 
   function makeServer(
@@ -108,12 +108,12 @@ export function buildServerList(
     name: string,
     serverConfig: McpServerConfig,
     source: McpSource,
-    scope: ZCodeMcpServer["scope"],
+    scope: RobinRunMcpServer["scope"],
     enabledBySource?: boolean,
     projectPath?: string,
-    file?: ZCodeMcpServer["file"],
-    location?: ZCodeMcpServer["location"],
-  ): ZCodeMcpServer {
+    file?: RobinRunMcpServer["file"],
+    location?: RobinRunMcpServer["location"],
+  ): RobinRunMcpServer {
     const prev = existingById.get(serverId);
     const configChanged = prev ? !isSameMcpServerConfig(prev.config, serverConfig) : true;
     return {
@@ -136,7 +136,7 @@ export function buildServerList(
     };
   }
 
-  const servers: ZCodeMcpServer[] = [];
+  const servers: RobinRunMcpServer[] = [];
 
   for (const server of nativeServers) {
     const serverId = makeServerId(server.source, server.name, server.projectPath, server.location?.source);
@@ -164,7 +164,7 @@ function isSameMcpServerConfig(left: McpServerConfig, right: McpServerConfig): b
   return JSON.stringify(left) === JSON.stringify(right);
 }
 
-export function getServerPriority(server: ZCodeMcpServer): number {
+export function getServerPriority(server: RobinRunMcpServer): number {
   if (server.scope === "workspace") return 2;
   if (server.scope === "user") return 1;
   return 0;

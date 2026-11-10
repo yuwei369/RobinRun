@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { parseRemoteWorkspaceIdentity } from "@zcode/shared";
+import { parseRemoteWorkspaceIdentity } from "@robinrun/shared";
 import {
   disconnectRemoteSource,
   reconnectRemoteProject,
@@ -33,13 +33,13 @@ const CASE_MARKER = "E2E_R3_DAEMON_SERVICE_FALLBACK";
 type ServiceCase = "stale-group" | "private-tmp" | "registered";
 const SUBCASE = (process.env.R3_DAEMON_SERVICE_CASE ?? "") as ServiceCase;
 const artifactDir = resolve(
-  process.env.ZCODE_E2E_ARTIFACT_DIR ?? ".e2e-artifacts/r3-daemon-service-fallback",
+  process.env.ROBINRUN_E2E_ARTIFACT_DIR ?? ".e2e-artifacts/r3-daemon-service-fallback",
 );
-const ACCESS_GROUP = "zcode-e2e-svc";
-const RESTRICTED_ROOT = "/srv/zcode-e2e-svc";
-const PRIVATE_TMP_ROOT = "/tmp/zcode-e2e-private";
-const SERVER_BIN = '"$HOME/.zcode/server/bin/zcode"';
-const SERVER_ROOT = '"$HOME/.zcode/server"';
+const ACCESS_GROUP = "robinrun-e2e-svc";
+const RESTRICTED_ROOT = "/srv/robinrun-e2e-svc";
+const PRIVATE_TMP_ROOT = "/tmp/robinrun-e2e-private";
+const SERVER_BIN = '"$HOME/.robinrun/server/bin/robinrun"';
+const SERVER_ROOT = '"$HOME/.robinrun/server"';
 const FALLBACK_LOG = "Source Server started in detached fallback mode for this remote environment";
 const REGISTERED_LOG = "Source Server registered with the remote OS user service manager";
 const REUSE_LOG = "Reusing running Source Server";
@@ -74,7 +74,7 @@ async function readManager(container: string): Promise<{ pid: number; groups: st
 async function readUnitState(config: SSHConnectionConfig): Promise<Record<string, string>> {
   const result = await runSSHCommand(
     config,
-    `unit=$(basename "$(ls ${SERVER_ROOT}/service/com.zhipu.zcode.server.*.service | head -n1)"); ` +
+    `unit=$(basename "$(ls ${SERVER_ROOT}/service/com.zhipu.robinrun.server.*.service | head -n1)"); ` +
       'echo "Unit=$unit"; systemctl --user show "$unit" -p LoadState -p ActiveState; ' +
       'echo "Enabled=$(systemctl --user is-enabled "$unit" 2>&1)"',
   );
@@ -109,8 +109,8 @@ async function prepareRemoteFixture(container: string, facts: Record<string, unk
     await rootShell(
       container,
       `set -e; groupadd ${ACCESS_GROUP}; install -d -o root -g ${ACCESS_GROUP} -m 0750 ${RESTRICTED_ROOT}; ` +
-        `install -d -o dev -g dev -m 0700 ${RESTRICTED_ROOT}/.zcode; ` +
-        `ln -sfn ${RESTRICTED_ROOT}/.zcode /home/dev/.zcode; chown -h dev:dev /home/dev/.zcode; ` +
+        `install -d -o dev -g dev -m 0700 ${RESTRICTED_ROOT}/.robinrun; ` +
+        `ln -sfn ${RESTRICTED_ROOT}/.robinrun /home/dev/.robinrun; chown -h dev:dev /home/dev/.robinrun; ` +
         `usermod -aG ${ACCESS_GROUP} dev`,
     );
     const gid = (await rootShell(container, `getent group ${ACCESS_GROUP} | cut -d: -f3`)).trim();
@@ -121,19 +121,19 @@ async function prepareRemoteFixture(container: string, facts: Record<string, unk
     return gid;
   }
   if (SUBCASE === "private-tmp") {
-    // manager 使用私有 /tmp，~/.zcode 指向宿主 /tmp：SSH 会话可写，manager 的挂载视图里不存在。
+    // manager 使用私有 /tmp，~/.robinrun 指向宿主 /tmp：SSH 会话可写，manager 的挂载视图里不存在。
     await rootShell(
       container,
       "set -e; mkdir -p /etc/systemd/system/user@1000.service.d; " +
-        "printf '[Service]\\nPrivateTmp=yes\\n' > /etc/systemd/system/user@1000.service.d/zcode-e2e-private-tmp.conf; " +
+        "printf '[Service]\\nPrivateTmp=yes\\n' > /etc/systemd/system/user@1000.service.d/robinrun-e2e-private-tmp.conf; " +
         "systemctl daemon-reload; systemctl restart user@1000.service; " +
-        `install -d -o dev -g dev -m 0700 ${PRIVATE_TMP_ROOT}/.zcode; ` +
-        `ln -sfn ${PRIVATE_TMP_ROOT}/.zcode /home/dev/.zcode; chown -h dev:dev /home/dev/.zcode`,
+        `install -d -o dev -g dev -m 0700 ${PRIVATE_TMP_ROOT}/.robinrun; ` +
+        `ln -sfn ${PRIVATE_TMP_ROOT}/.robinrun /home/dev/.robinrun; chown -h dev:dev /home/dev/.robinrun`,
     );
     const manager = await readManager(container);
     const hidden = await rootShell(
       container,
-      `test -d ${PRIVATE_TMP_ROOT}/.zcode && echo host-visible; ` +
+      `test -d ${PRIVATE_TMP_ROOT}/.robinrun && echo host-visible; ` +
         `nsenter -t ${manager.pid} -m test -e ${PRIVATE_TMP_ROOT} && echo manager-visible || echo manager-hidden`,
     );
     expect(hidden.trim().split("\n")).toEqual(["host-visible", "manager-hidden"]);
@@ -173,13 +173,13 @@ describe(`${CASE_MARKER}: systemd 注册装载失败时回退 detached fallback�
     await browser.execute(() => {
       const state = window as Window & {
         __serviceFallbackLogs?: ConnectionLog[];
-        zcode?: {
+        robinrun?: {
           onRemoteConnectionLog: (callback: (entry: ConnectionLog) => void) => () => void;
         };
       };
       state.__serviceFallbackLogs = [];
-      if (!state.zcode) throw new Error("Missing desktop platform");
-      state.zcode.onRemoteConnectionLog(({ message, level }) =>
+      if (!state.robinrun) throw new Error("Missing desktop platform");
+      state.robinrun.onRemoteConnectionLog(({ message, level }) =>
         state.__serviceFallbackLogs!.push({ message, level }),
       );
     });
@@ -212,7 +212,7 @@ describe(`${CASE_MARKER}: systemd 注册装载失败时回退 detached fallback�
       // 装载阶段失败时没有启动任何 unit。
       expect(unit0).toMatchObject({ LoadState: "not-found", ActiveState: "inactive" });
       const fallbackLog = findLog(firstLogs, `${FALLBACK_LOG} (`);
-      expect(fallbackLog?.message).toContain("Failed to register service com.zhipu.zcode.server.");
+      expect(fallbackLog?.message).toContain("Failed to register service com.zhipu.robinrun.server.");
       expect(fallbackLog?.message).toContain(
         SUBCASE === "stale-group"
           ? "Failed to enable unit: Access denied"

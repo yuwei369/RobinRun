@@ -5,7 +5,7 @@ import { pathToFileURL } from "node:url";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import { resolveZCodeEndpointOrigin } from "@zcode/shared/zcodeEndpoint";
+import { resolveRobinRunEndpointOrigin } from "@robinrun/shared/robinrunEndpoint";
 import { pdfJsCMapsPlugin } from "../ui/vite/pdfJsCMapsPlugin.js";
 import { getBuildMetadata } from "./scripts/build-metadata.mjs";
 import { resolveDesktopProductFlavor } from "./scripts/desktop-product-identity.mjs";
@@ -56,7 +56,7 @@ export const desktopRendererDependencyAliases = {
   "lucide-react": resolveInstalledPackageRoot("lucide-react"),
 } as const;
 
-function resolveZCodeEnv(value: string | undefined): "test" | "production" {
+function resolveRobinRunEnv(value: string | undefined): "test" | "production" {
   return value?.trim().toLowerCase() === "production" ? "production" : "test";
 }
 
@@ -82,7 +82,7 @@ function createE2EUIRendererCoveragePlugin(repoRoot: string): Plugin {
   );
 
   return {
-    name: "zcode:e2e-ui-source-coverage",
+    name: "robinrun:e2e-ui-source-coverage",
     enforce: "pre",
     transform(sourceCode, id, options) {
       if (options?.ssr || id.startsWith("\0")) {
@@ -153,7 +153,7 @@ function stripViteRequestQuery(id: string) {
 function createReactScanDevPlugin(): Plugin {
   const scriptPath = normalizePathForVite(desktopRequire.resolve("react-scan/dist/auto.global.js"));
   return {
-    name: "zcode:react-scan",
+    name: "robinrun:react-scan",
     apply: "serve",
     transformIndexHtml: {
       order: "post",
@@ -167,32 +167,32 @@ function createReactScanDevPlugin(): Plugin {
 }
 
 export default defineConfig(({ command, mode }) => {
-  // `.env*` 只提供链接常量；当前产品环境由启动脚本或 CI 注入 ZCODE_ENV。
+  // `.env*` 只提供链接常量；当前产品环境由启动脚本或 CI 注入 ROBINRUN_ENV。
   const env = loadEnv(mode, "../..", "");
   const repoRoot = resolve(__dirname, "../..");
-  const zcodeEnv = resolveZCodeEnv(env.ZCODE_ENV);
+  const robinrunEnv = resolveRobinRunEnv(env.ROBINRUN_ENV);
   // 安装包身份与后端环境分轴；renderer 用它决定是否展示更新入口。
-  const zcodeProductFlavor = resolveDesktopProductFlavor({
+  const robinrunProductFlavor = resolveDesktopProductFlavor({
     ...process.env,
     ...env,
-    ZCODE_ENV: zcodeEnv,
+    ROBINRUN_ENV: robinrunEnv,
   });
   const e2eCoverageEnabled =
-    env.ZCODE_E2E_COVERAGE === "1" || process.env.ZCODE_E2E_COVERAGE === "1";
+    env.ROBINRUN_E2E_COVERAGE === "1" || process.env.ROBINRUN_E2E_COVERAGE === "1";
   const e2eStoreBridgeEnabled =
-    env.VITE_ZCODE_E2E_STORE_BRIDGE === "1" || process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1";
-  const zcodeEndpointOrigin = resolveZCodeEndpointOrigin({
-    env: zcodeEnv,
+    env.VITE_ROBINRUN_E2E_STORE_BRIDGE === "1" || process.env.VITE_ROBINRUN_E2E_STORE_BRIDGE === "1";
+  const robinrunEndpointOrigin = resolveRobinRunEndpointOrigin({
+    env: robinrunEnv,
     envBaseOrigin:
-      env.ZCODE_BASE_URL ??
-      env.ZCODE_ENDPOINT_ORIGIN ??
-      (zcodeEnv === "production" ? env.ZCODE_PRODUCTION_BASE_URL : env.ZCODE_TEST_BASE_URL),
+      env.ROBINRUN_BASE_URL ??
+      env.ROBINRUN_ENDPOINT_ORIGIN ??
+      (robinrunEnv === "production" ? env.ROBINRUN_PRODUCTION_BASE_URL : env.ROBINRUN_TEST_BASE_URL),
   });
   const codingPlanWebviewOrigin =
     env.VITE_CODING_PLAN_WEBVIEW_ORIGIN ?? process.env.VITE_CODING_PLAN_WEBVIEW_ORIGIN ?? "";
   const plugins = [
-    // 仅开发服务器装配，所有 build 都不注入；后端 ZCODE_ENV 不决定是否开启开发工具。
-    ...(command === "serve" && mode !== "production" && env.ZCODE_REACT_SCAN !== "0"
+    // 仅开发服务器装配，所有 build 都不注入；后端 ROBINRUN_ENV 不决定是否开启开发工具。
+    ...(command === "serve" && mode !== "production" && env.ROBINRUN_REACT_SCAN !== "0"
       ? [createReactScanDevPlugin()]
       : []),
     ...(e2eCoverageEnabled ? [createE2EUIRendererCoveragePlugin(repoRoot)] : []),
@@ -221,23 +221,23 @@ export default defineConfig(({ command, mode }) => {
     },
     server: { port: 5174, strictPort: true },
     define: {
-      __ZCODE_VERSION__: JSON.stringify(buildMetadata.appVersion),
-      __ZCODE_MIN_COMPATIBLE_VERSION__: JSON.stringify(buildMetadata.minCompatibleVersion),
-      __ZCODE_COMMIT__: JSON.stringify(buildMetadata.buildCommitId),
-      __ZCODE_BUILD_TIME__: JSON.stringify(buildMetadata.buildTime),
-      __ZCODE_ENV__: JSON.stringify(zcodeEnv),
-      __ZCODE_PRODUCT_FLAVOR__: JSON.stringify(zcodeProductFlavor),
+      __ROBINRUN_VERSION__: JSON.stringify(buildMetadata.appVersion),
+      __ROBINRUN_MIN_COMPATIBLE_VERSION__: JSON.stringify(buildMetadata.minCompatibleVersion),
+      __ROBINRUN_COMMIT__: JSON.stringify(buildMetadata.buildCommitId),
+      __ROBINRUN_BUILD_TIME__: JSON.stringify(buildMetadata.buildTime),
+      __ROBINRUN_ENV__: JSON.stringify(robinrunEnv),
+      __ROBINRUN_PRODUCT_FLAVOR__: JSON.stringify(robinrunProductFlavor),
       ...buildTimeConfigDefines,
-      __ZCODE_LOCAL_DEVELOPMENT_RUNTIME__: JSON.stringify(mode !== "production"),
-      "import.meta.env.VITE_ZCODE_BASE_URL": JSON.stringify(zcodeEndpointOrigin),
-      // 兼容旧 renderer 读取名；新代码统一读 VITE_ZCODE_BASE_URL。
-      "import.meta.env.VITE_ZCODE_ENDPOINT_ORIGIN": JSON.stringify(zcodeEndpointOrigin),
+      __ROBINRUN_LOCAL_DEVELOPMENT_RUNTIME__: JSON.stringify(mode !== "production"),
+      "import.meta.env.VITE_ROBINRUN_BASE_URL": JSON.stringify(robinrunEndpointOrigin),
+      // 兼容旧 renderer 读取名；新代码统一读 VITE_ROBINRUN_BASE_URL。
+      "import.meta.env.VITE_ROBINRUN_ENDPOINT_ORIGIN": JSON.stringify(robinrunEndpointOrigin),
       "import.meta.env.VITE_CODING_PLAN_WEBVIEW_ORIGIN": JSON.stringify(codingPlanWebviewOrigin),
       "import.meta.env.VITE_REWARDS_WEBVIEW_ORIGIN": JSON.stringify(
         env.VITE_REWARDS_WEBVIEW_ORIGIN ?? process.env.VITE_REWARDS_WEBVIEW_ORIGIN ?? "",
       ),
-      // Bugfix: E2E store bridge 只能由 WDIO 专用变量打开，避免把 ZCODE_ENV=test 产品环境误当成测试运行态。
-      "import.meta.env.VITE_ZCODE_E2E_STORE_BRIDGE": JSON.stringify(
+      // Bugfix: E2E store bridge 只能由 WDIO 专用变量打开，避免把 ROBINRUN_ENV=test 产品环境误当成测试运行态。
+      "import.meta.env.VITE_ROBINRUN_E2E_STORE_BRIDGE": JSON.stringify(
         e2eStoreBridgeEnabled ? "1" : "",
       ),
     },
@@ -263,7 +263,7 @@ export default defineConfig(({ command, mode }) => {
           index: resolve(__dirname, "src/renderer/index.html"),
           "resource-manager": resolve(__dirname, "src/renderer/resource-manager.html"),
           "cua-permission-panel": resolve(__dirname, "src/renderer/cua-permission-panel.html"),
-          // 插件 UI 沙箱的受信 shell，经 zcode-sandbox:// 提供
+          // 插件 UI 沙箱的受信 shell，经 robinrun-sandbox:// 提供
           "plugin-sandbox": resolve(__dirname, "src/renderer/plugin-sandbox.html"),
         },
       },

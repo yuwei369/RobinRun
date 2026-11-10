@@ -1,7 +1,7 @@
-import type { ZCodeTaskChangeSummary } from "@zcode/shared";
+import type { RobinRunTaskChangeSummary } from "@robinrun/shared";
 
 export function formatGroupedTaskHoverChangeParts(
-  summary: ZCodeTaskChangeSummary | null,
+  summary: RobinRunTaskChangeSummary | null,
 ): string[] {
   if (!summary) {
     return [];

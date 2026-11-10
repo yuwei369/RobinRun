@@ -43,7 +43,7 @@ function expectStatus(result, status, label) {
 function verifyBashEmbeddedSearch(plan) {
   const buildResult = execute(
     "pnpm",
-    ["--dir", repoRoot, "--filter", "@zcode/bootstrap^...", "--if-present", "build"],
+    ["--dir", repoRoot, "--filter", "@robinrun/bootstrap^...", "--if-present", "build"],
     { cwd: repoRoot, env: process.env },
   );
   expectStatus(buildResult, 0, "Bash embedded search dependency build");
@@ -52,7 +52,7 @@ function verifyBashEmbeddedSearch(plan) {
     "pnpm",
     [
       "--dir",
-      join(repoRoot, "apps/zcode-cli"),
+      join(repoRoot, "apps/robinrun-cli"),
       "exec",
       "vitest",
       "run",
@@ -64,10 +64,10 @@ function verifyBashEmbeddedSearch(plan) {
       cwd: repoRoot,
       env: {
         ...process.env,
-        ...(plan.bfsPath ? { ZCODE_BFS_BINARY: plan.bfsPath } : {}),
-        ZCODE_REQUIRE_NATIVE_SEARCH_E2E: "1",
-        ZCODE_RG_BINARY: plan.rgPath,
-        ZCODE_UGREP_BINARY: plan.ugrepPath,
+        ...(plan.bfsPath ? { ROBINRUN_BFS_BINARY: plan.bfsPath } : {}),
+        ROBINRUN_REQUIRE_NATIVE_SEARCH_E2E: "1",
+        ROBINRUN_RG_BINARY: plan.rgPath,
+        ROBINRUN_UGREP_BINARY: plan.ugrepPath,
       },
     },
   );
@@ -80,11 +80,11 @@ function verifyBashEmbeddedSearch(plan) {
 }
 
 async function resolveNativeSearchPlan(outputDir) {
-  const targetPlatform = process.env.ZCODE_TARGET_OS?.trim() || process.platform;
-  const targetArch = process.env.ZCODE_TARGET_ARCH?.trim() || process.arch;
-  const bfsPath = process.env.ZCODE_BFS_BINARY?.trim();
-  const rgPath = process.env.ZCODE_RG_BINARY?.trim();
-  const ugrepPath = process.env.ZCODE_UGREP_BINARY?.trim();
+  const targetPlatform = process.env.ROBINRUN_TARGET_OS?.trim() || process.platform;
+  const targetArch = process.env.ROBINRUN_TARGET_ARCH?.trim() || process.arch;
+  const bfsPath = process.env.ROBINRUN_BFS_BINARY?.trim();
+  const rgPath = process.env.ROBINRUN_RG_BINARY?.trim();
+  const ugrepPath = process.env.ROBINRUN_UGREP_BINARY?.trim();
   const normalizedPlatform = normalizeNativeSearchPlatform(targetPlatform);
   const requiresBfs = normalizedPlatform !== "win32";
   if (!requiresBfs) {
@@ -101,8 +101,8 @@ async function resolveNativeSearchPlan(outputDir) {
       Boolean(bfsPath || rgPath || ugrepPath),
       false,
       requiresBfs
-        ? "ZCODE_BFS_BINARY, ZCODE_RG_BINARY, and ZCODE_UGREP_BINARY must be provided together"
-        : "ZCODE_RG_BINARY and ZCODE_UGREP_BINARY must be provided together",
+        ? "ROBINRUN_BFS_BINARY, ROBINRUN_RG_BINARY, and ROBINRUN_UGREP_BINARY must be provided together"
+        : "ROBINRUN_RG_BINARY and ROBINRUN_UGREP_BINARY must be provided together",
     );
     buildNativeSearchTools({
       platform: targetPlatform,
@@ -146,7 +146,7 @@ async function main() {
     process.platform === "darwin" || process.platform === "linux" || process.platform === "win32",
     "this E2E must run on macOS, Linux, or Windows",
   );
-  const e2eRoot = mkdtempSync(join(tmpdir(), "zcode-native-search-e2e-"));
+  const e2eRoot = mkdtempSync(join(tmpdir(), "robinrun-native-search-e2e-"));
 
   try {
     const plan = await resolveNativeSearchPlan(join(e2eRoot, "runtime-tools"));

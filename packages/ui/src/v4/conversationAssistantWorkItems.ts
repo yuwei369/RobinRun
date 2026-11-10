@@ -1,4 +1,4 @@
-import type { SubagentRow, ToolCallRow } from "@zcode/shared/zcode-protocol-v4";
+import type { SubagentRow, ToolCallRow } from "@robinrun/shared/robinrun-protocol-v4";
 import {
   isExecuteToolCall,
   isExploreToolCall,

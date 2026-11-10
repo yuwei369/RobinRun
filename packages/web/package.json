@@ -1,5 +1,5 @@
 {
-  "name": "@zcode/web",
+  "name": "@robinrun/web",
   "private": true,
   "type": "module",
   "imports": {
@@ -12,9 +12,9 @@
     "lint:fix": "oxlint --fix"
   },
   "dependencies": {
-    "@zcode/client": "workspace:*",
-    "@zcode/shared": "workspace:*",
-    "@zcode/ui": "workspace:*",
+    "@robinrun/client": "workspace:*",
+    "@robinrun/shared": "workspace:*",
+    "@robinrun/ui": "workspace:*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

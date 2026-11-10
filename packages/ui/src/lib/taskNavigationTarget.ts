@@ -1,12 +1,12 @@
-import type { ZCodeTaskMeta } from "@zcode/shared";
+import type { RobinRunTaskMeta } from "@robinrun/shared";
 import type { TaskNavEntry } from "@/lib/taskNavigationHistory.js";
 import type { TaskEntityKey } from "@/lib/taskQueryCache.js";
 import { buildTaskEntityKey } from "@/lib/taskQueryCache.js";
 
 export function taskNavigationTargetExists(params: {
   entry: TaskNavEntry;
-  visibleTasks: readonly Pick<ZCodeTaskMeta, "taskId">[];
-  taskMetaByEntityKey: Record<TaskEntityKey, ZCodeTaskMeta>;
+  visibleTasks: readonly Pick<RobinRunTaskMeta, "taskId">[];
+  taskMetaByEntityKey: Record<TaskEntityKey, RobinRunTaskMeta>;
 }): boolean {
   if (params.visibleTasks.some((task) => task.taskId === params.entry.taskId)) {
     return true;

@@ -1,4 +1,4 @@
-import type { BotProvider, ZCodeStreamEvent } from "@zcode/shared";
+import type { BotProvider, RobinRunStreamEvent } from "@robinrun/shared";
 import {
   createBotsServiceHarness,
   createFeishuConfig,
@@ -72,9 +72,9 @@ describe("BOT-E2E-PS-01 private task output subscription", () => {
           type: "task_run_started",
           startedAt: Date.now(),
           inputOrigin,
-        } as ZCodeStreamEvent);
-        await emit({ ...base, type: "agent_message_chunk", content: id } as ZCodeStreamEvent);
-        await emit({ ...base, type: "task_complete", stopReason: "end_turn" } as ZCodeStreamEvent);
+        } as RobinRunStreamEvent);
+        await emit({ ...base, type: "agent_message_chunk", content: id } as RobinRunStreamEvent);
+        await emit({ ...base, type: "task_complete", stopReason: "end_turn" } as RobinRunStreamEvent);
       };
       await run("IM_REPLY", "desktop");
       await run("DESKTOP_REPLY", "desktop");

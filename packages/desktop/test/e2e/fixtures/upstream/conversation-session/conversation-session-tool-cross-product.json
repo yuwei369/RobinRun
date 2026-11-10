@@ -543,7 +543,7 @@
           "id": "toolu_e2e_tool_cross_product_skill",
           "name": "Skill",
           "input": {
-            "skill": "zcode-e2e-missing-skill"
+            "skill": "robinrun-e2e-missing-skill"
           }
         }
       }

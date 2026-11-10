@@ -3,35 +3,35 @@
  * MCP Settings Section
  *
  * Manages MCP server configuration in the settings page.
- * Supports the unified ZCode Agent MCP source backed by settings directories.
+ * Supports the unified RobinRun Agent MCP source backed by settings directories.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { convertToZCodeAgentMcpServer } from "@zcode/shared";
+import { convertToRobinRunAgentMcpServer } from "@robinrun/shared";
 import {
   TID_MCP_OPEN_AUTHORIZATION_BUTTON,
   TID_PLUGIN_MCP_SERVER_ROW,
   testId,
-} from "@zcode/shared/test-ids";
+} from "@robinrun/shared/test-ids";
 import type {
   RemoteTarget,
   WorkspaceMcpTrustDecision,
-  ZCodeWorkspaceMcpTrustResult,
-  ZCodeAvailablePluginSummary,
-  ZCodeAgentMcpServer,
-  ZCodeMcpListMode,
-  ZCodeMcpServer,
-  ZCodeMcpServerStatusSnapshot,
-  ZCodePluginInfo,
-} from "@zcode/shared";
+  RobinRunWorkspaceMcpTrustResult,
+  RobinRunAvailablePluginSummary,
+  RobinRunAgentMcpServer,
+  RobinRunMcpListMode,
+  RobinRunMcpServer,
+  RobinRunMcpServerStatusSnapshot,
+  RobinRunPluginInfo,
+} from "@robinrun/shared";
 import {
-  isZCodeAgentMcpStatusModeUnsupportedError,
+  isRobinRunAgentMcpStatusModeUnsupportedError,
   type IServiceAccessor,
   type IMcpSyncService,
-} from "@zcode/services";
+} from "@robinrun/services";
 import { Button } from "@/components/ui/button.js";
 import { toast } from "@/components/ui/toast.js";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
-import { useZCodeIntl } from "@/i18n/IntlProvider.js";
+import { useRobinRunIntl } from "@/i18n/IntlProvider.js";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
 import { logger } from "@/logger.js";
 import { McpServerForm } from "@/settings/McpServerForm.js";
@@ -81,7 +81,7 @@ import { ExternalLink, Import, Plus, UploadCloud } from "lucide-react";
 import { SettingsSegmentedTabs } from "@/settings/SettingsSegmentedTabs.js";
 import { selectPluginsForScope } from "@/settings/pluginCapabilityProjection.js";
 
-const DEFAULT_MCP_SOURCE: ServerScope = "zcodeagentmcp";
+const DEFAULT_MCP_SOURCE: ServerScope = "robinrunagentmcp";
 const MCP_OAUTH_AUTHORIZATION_STATUS_REFRESH_MS = 1_000;
 const MCP_OAUTH_AUTHORIZATION_STATUS_REFRESH_DURATION_MS = 5 * 60_000;
 const MCP_OAUTH_AUTHORIZATION_FOLLOWUP_REFRESH_ATTEMPTS = 10;
@@ -89,7 +89,7 @@ const MCP_OAUTH_AUTHORIZATION_FOLLOWUP_REFRESH_ATTEMPTS = 10;
 export async function applyWorkspaceMcpTrustDecision(
   request: WorkspaceMcpTrustDecision,
   isCurrentTarget: () => boolean,
-  decide: (request: WorkspaceMcpTrustDecision) => Promise<ZCodeWorkspaceMcpTrustResult>,
+  decide: (request: WorkspaceMcpTrustDecision) => Promise<RobinRunWorkspaceMcpTrustResult>,
 ): Promise<boolean> {
   if (!isCurrentTarget()) return false;
   const result = await decide(request);
@@ -127,24 +127,24 @@ export async function refreshMcpServerStatusList({
   workspacePath,
   mcpSyncService,
 }: {
-  beginServerStatusListRefresh: (mode?: ZCodeMcpListMode) => number;
+  beginServerStatusListRefresh: (mode?: RobinRunMcpListMode) => number;
   markServerStatusListRefreshFailed?: (
     error: string,
     requestEpoch: number,
-    mode?: ZCodeMcpListMode,
+    mode?: RobinRunMcpListMode,
   ) => void;
   mergeServerStatusSnapshots: (
-    statuses: Record<string, ZCodeMcpServerStatusSnapshot>,
+    statuses: Record<string, RobinRunMcpServerStatusSnapshot>,
     requestEpoch: number,
-    mode?: ZCodeMcpListMode,
+    mode?: RobinRunMcpListMode,
   ) => void;
   getCurrentWorkspaceKey: () => string;
-  mode?: ZCodeMcpListMode;
-  mcpServers?: ZCodeAgentMcpServer[];
+  mode?: RobinRunMcpListMode;
+  mcpServers?: RobinRunAgentMcpServer[];
   requestedWorkspaceKey: string;
   workspaceIdentity?: string;
   workspacePath: string;
-  // mcp/list 收敛到 IMcpSyncService——UI 不直接触达 zcodeAgentService。
+  // mcp/list 收敛到 IMcpSyncService——UI 不直接触达 robinrunAgentService。
   mcpSyncService: Pick<IMcpSyncService, "listWorkspaceMcpServerStatuses">;
 }): Promise<McpServerStatusListRefreshOutcome> {
   if (!requestedWorkspaceKey || getCurrentWorkspaceKey() !== requestedWorkspaceKey) {
@@ -168,7 +168,7 @@ export async function refreshMcpServerStatusList({
     if (getCurrentWorkspaceKey() !== requestedWorkspaceKey) {
       return "stale-workspace";
     }
-    if (refreshMode === "status" && isZCodeAgentMcpStatusModeUnsupportedError(error)) {
+    if (refreshMode === "status" && isRobinRunAgentMcpStatusModeUnsupportedError(error)) {
       return "status-mode-unsupported";
     }
     markServerStatusListRefreshFailed?.(
@@ -181,7 +181,7 @@ export async function refreshMcpServerStatusList({
 }
 
 export interface McpOAuthAuthorizationPendingRefresh {
-  mcpServers: ZCodeAgentMcpServer[];
+  mcpServers: RobinRunAgentMcpServer[];
   pendingKey: string;
   workspaceKey: string;
 }
@@ -202,7 +202,7 @@ export function transitionMcpAutoStatusListRefreshKey(
 }
 
 export interface McpOAuthAuthorizationFollowupRefresh {
-  mcpServers: ZCodeAgentMcpServer[];
+  mcpServers: RobinRunAgentMcpServer[];
   refreshKey: string;
   workspaceKey: string;
 }
@@ -217,7 +217,7 @@ export function transitionMcpOAuthAuthorizationPendingRefresh({
 }: {
   activeWorkspaceKey: string;
   existingFollowup?: McpOAuthAuthorizationFollowupRefresh | null;
-  mcpServers: ZCodeAgentMcpServer[];
+  mcpServers: RobinRunAgentMcpServer[];
   now?: () => number;
   pendingKey: string;
   previous: McpOAuthAuthorizationPendingRefresh | null;
@@ -334,19 +334,19 @@ export function createMcpStatusListRefreshQueue(): McpStatusListRefreshQueue {
 }
 
 export function buildMcpOAuthAuthorizationStatusRefreshServers(
-  servers: ZCodeMcpServer[],
-  statusSnapshots: Record<string, ZCodeMcpServerStatusSnapshot> = {},
-): ZCodeAgentMcpServer[] {
+  servers: RobinRunMcpServer[],
+  statusSnapshots: Record<string, RobinRunMcpServerStatusSnapshot> = {},
+): RobinRunAgentMcpServer[] {
   const pendingSnapshotNames = new Set(
     Object.entries(statusSnapshots)
       .filter(([, snapshot]) => Boolean(snapshot.authorization?.authorizationUrl))
       .map(([serverName]) => serverName),
   );
-  const result: ZCodeAgentMcpServer[] = [];
+  const result: RobinRunAgentMcpServer[] = [];
   const seenNames = new Set<string>();
 
   for (const server of servers) {
-    if (server.source !== "zcodeagentmcp" || !server.enabled) {
+    if (server.source !== "robinrunagentmcp" || !server.enabled) {
       continue;
     }
     const hasPendingAuthorization =
@@ -354,24 +354,24 @@ export function buildMcpOAuthAuthorizationStatusRefreshServers(
     if (!hasPendingAuthorization || seenNames.has(server.name)) {
       continue;
     }
-    const zcodeAgentServer = convertToZCodeAgentMcpServer(
+    const robinrunAgentServer = convertToRobinRunAgentMcpServer(
       server.name,
       server.config,
       server.scope === "workspace" ? "workspace" : "user",
     );
-    if (!zcodeAgentServer) {
+    if (!robinrunAgentServer) {
       continue;
     }
     seenNames.add(server.name);
-    result.push(zcodeAgentServer);
+    result.push(robinrunAgentServer);
   }
 
   return result;
 }
 
-export function buildMcpOAuthAuthorizationStatusRefreshOptions(mcpServers: ZCodeAgentMcpServer[]): {
+export function buildMcpOAuthAuthorizationStatusRefreshOptions(mcpServers: RobinRunAgentMcpServer[]): {
   mode: "status";
-  mcpServers: ZCodeAgentMcpServer[];
+  mcpServers: RobinRunAgentMcpServer[];
 } {
   return {
     // OAuth pending/follow-up/focus 刷新只读运行态，不能让 pending 子集进入 connect replace 路径。
@@ -380,9 +380,9 @@ export function buildMcpOAuthAuthorizationStatusRefreshOptions(mcpServers: ZCode
   };
 }
 
-export function buildMcpServerStatusListKey(servers: ZCodeMcpServer[]): string {
+export function buildMcpServerStatusListKey(servers: RobinRunMcpServer[]): string {
   return servers
-    .filter((server) => server.source === "zcodeagentmcp")
+    .filter((server) => server.source === "robinrunagentmcp")
     .map((server) => {
       const enabledKey = server.enabled ? "enabled" : "disabled";
       return `${server.id}:${enabledKey}:${JSON.stringify(server.config)}`;
@@ -390,7 +390,7 @@ export function buildMcpServerStatusListKey(servers: ZCodeMcpServer[]): string {
     .join("|");
 }
 
-export function buildPluginMcpServerStatusListKey(plugins: ZCodePluginInfo[]): string {
+export function buildPluginMcpServerStatusListKey(plugins: RobinRunPluginInfo[]): string {
   return plugins
     .map((plugin) => {
       const declaredNames = plugin.declaredMcpServerNames ?? [];
@@ -420,13 +420,13 @@ export function shouldShowPluginMcpServersInMcpSettings(isRemoteSyncContext: boo
 }
 
 export function buildPendingMcpOAuthAuthorizationRefreshKey(
-  servers: ZCodeMcpServer[],
-  statusSnapshots: Record<string, ZCodeMcpServerStatusSnapshot> = {},
+  servers: RobinRunMcpServer[],
+  statusSnapshots: Record<string, RobinRunMcpServerStatusSnapshot> = {},
 ): string {
   const localPendingKeys = servers
     .filter(
       (server) =>
-        server.source === "zcodeagentmcp" &&
+        server.source === "robinrunagentmcp" &&
         server.enabled &&
         Boolean(server.authorization?.authorizationUrl),
     )
@@ -443,10 +443,10 @@ function PluginMcpServerList({
   onOpenAuthorization,
 }: {
   items: PluginMcpServerItem[];
-  pluginListingById: ReadonlyMap<string, ZCodeAvailablePluginSummary["listing"]>;
+  pluginListingById: ReadonlyMap<string, RobinRunAvailablePluginSummary["listing"]>;
   onOpenAuthorization?: (item: PluginMcpServerItem) => void;
 }) {
-  const { intl } = useZCodeIntl();
+  const { intl } = useRobinRunIntl();
   const openAuthorizationLabel = intl.formatMessage({
     id: "settings.mcp.oauth.openAuthorization",
   });
@@ -598,7 +598,7 @@ export function McpSettingsSection({
   unscopedServices,
   cacheAuthorityKey,
 }: McpSettingsSectionProps) {
-  const { intl, locale } = useZCodeIntl();
+  const { intl, locale } = useRobinRunIntl();
   const confirmDialog = useConfirmDialog();
   const services = useWorkspaceServices(
     workspacePath,
@@ -649,7 +649,7 @@ export function McpSettingsSection({
 
   const [showForm, setShowForm] = useState(false);
   const [formScopeKey, setFormScopeKey] = useState(parentScopeKey);
-  const [editingServer, setEditingServer] = useState<ZCodeMcpServer | null>(null);
+  const [editingServer, setEditingServer] = useState<RobinRunMcpServer | null>(null);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const query = searchQuery;
   const [editorMode, setEditorMode] = useState<McpEditorMode>("form");
@@ -746,8 +746,8 @@ export function McpSettingsSection({
   const lastAutoStatusListRefreshKeyRef = useRef("");
   const requestMcpServerStatusList = useCallback(
     async (options?: {
-      mcpServers?: ZCodeAgentMcpServer[];
-      mode?: ZCodeMcpListMode;
+      mcpServers?: RobinRunAgentMcpServer[];
+      mode?: RobinRunMcpListMode;
       trigger?: McpStatusListRefreshTrigger;
     }) => {
       const trigger = options?.trigger ?? "auto";
@@ -786,7 +786,7 @@ export function McpSettingsSection({
       // skipReason 已经覆盖了这个分支，这里只为类型收窄。
       if (!requestedWorkspacePath) return;
       const requestedMcpServers =
-        options?.mcpServers ?? useMcpStore.getState().getEnabledMcpServersForZCode("zcode");
+        options?.mcpServers ?? useMcpStore.getState().getEnabledMcpServersForRobinRun("robinrun");
       await statusListRefreshQueueRef.current?.request(async () => {
         if (!isRequestCurrent()) {
           return;
@@ -1309,7 +1309,7 @@ export function McpSettingsSection({
     [activeWorkspaceKey, services.mcpSyncService],
   );
 
-  async function handleWorkspaceMcpTrust(server: ZCodeMcpServer) {
+  async function handleWorkspaceMcpTrust(server: RobinRunMcpServer) {
     const review = server.workspaceTrust;
     if (trustAbortRef.current) return;
     const controller = new AbortController();
@@ -1367,7 +1367,7 @@ export function McpSettingsSection({
     }
   }
 
-  async function handleSave(form: FormState, prev?: ZCodeMcpServer) {
+  async function handleSave(form: FormState, prev?: RobinRunMcpServer) {
     if (!activeWorkspacePath) {
       return;
     }
@@ -1399,7 +1399,7 @@ export function McpSettingsSection({
     onFormScopeKeyChange?.(null);
   }
 
-  async function handleDelete(server: ZCodeMcpServer) {
+  async function handleDelete(server: RobinRunMcpServer) {
     const confirmed = await confirmDialog({
       confirmVariant: "destructive",
       title: intl.formatMessage({ id: "settings.mcp.deleteConfirmTitle" }, { name: server.name }),
@@ -1423,7 +1423,7 @@ export function McpSettingsSection({
     onFormScopeKeyChange?.(null);
   }
 
-  function handleEdit(server: ZCodeMcpServer) {
+  function handleEdit(server: RobinRunMcpServer) {
     const ownerWorkspace = workspaceTabs.find((tab) => tab.workspacePath === server.projectPath);
     const ownedScopeKey =
       server.scope === "workspace"
@@ -1446,7 +1446,7 @@ export function McpSettingsSection({
     setShowForm(true);
   }
 
-  function handleOpenAuthorization(server: ZCodeMcpServer) {
+  function handleOpenAuthorization(server: RobinRunMcpServer) {
     const authorizationUrl = server.authorization?.authorizationUrl;
     if (!authorizationUrl) {
       return;

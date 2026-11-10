@@ -1,7 +1,7 @@
-import type { ZCodeEnv } from "@zcode/shared";
+import type { RobinRunEnv } from "@robinrun/shared";
 
 export function shouldShowRemoteConnectionEntry(params: {
-  env: ZCodeEnv;
+  env: RobinRunEnv;
   isIntranet: boolean;
 }): boolean {
   void params;

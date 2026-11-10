@@ -1,6 +1,6 @@
-import type { ZCodeTaskMeta } from "@zcode/shared";
-import { getTaskMeta, useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
-import { mergeTaskMetaCandidates } from "@/lib/zcodeTaskMetaMerge.js";
+import type { RobinRunTaskMeta } from "@robinrun/shared";
+import { getTaskMeta, useRobinRunSessionStore } from "@/store/robinrunSessionStore.js";
+import { mergeTaskMetaCandidates } from "@/lib/robinrunTaskMetaMerge.js";
 import {
   applyTaskQueryCacheMutation,
   updateTaskQueryCacheTaskMetaPreservingMembership,
@@ -15,7 +15,7 @@ const ABSENT_MEMBERSHIP: TaskListMembershipState = {
   archived: true,
 };
 
-function sortTasksByUpdatedAt(tasks: readonly ZCodeTaskMeta[]): ZCodeTaskMeta[] {
+function sortTasksByUpdatedAt(tasks: readonly RobinRunTaskMeta[]): RobinRunTaskMeta[] {
   return [...tasks].sort((left, right) => {
     if (right.updatedAt !== left.updatedAt) {
       return right.updatedAt - left.updatedAt;
@@ -30,14 +30,14 @@ function sortTasksByUpdatedAt(tasks: readonly ZCodeTaskMeta[]): ZCodeTaskMeta[] 
 export function syncTaskMetaToTaskCaches(params: {
   workspacePath: string;
   workspaceIdentity?: string;
-  task: ZCodeTaskMeta;
+  task: RobinRunTaskMeta;
   membership?: TaskListMembershipState;
   forceInsertMembership?: boolean;
   ensureInWorkspaceTaskCache?: boolean;
   preserveListMembership?: boolean;
   applyQueryCacheMutation?: boolean;
 }): void {
-  const store = useZCodeSessionStore.getState();
+  const store = useRobinRunSessionStore.getState();
   const workspaceState = store.getWorkspaceState(params.workspacePath, params.workspaceIdentity);
   const previousTask = getTaskMeta(workspaceState, params.task.taskId);
   const queryTask =
@@ -105,7 +105,7 @@ export function syncTaskMetaToTaskCaches(params: {
 export function insertTaskIntoTaskCaches(params: {
   workspacePath: string;
   workspaceIdentity?: string;
-  task: ZCodeTaskMeta;
+  task: RobinRunTaskMeta;
   membership: TaskListMembershipState;
 }): void {
   // Bugfix: 新建/fork/远控 shared-host 创建 task 都应走同一条“无 -> 有”成员变更。
