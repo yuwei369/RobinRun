@@ -10,9 +10,16 @@ RobinRun 是一个**全自动线上运营（非运维）Harness 系统**，基�
 
 ## 仓库布局
 
-- `reference/ZCode/`：ZCode 上游完整源码（v3.17.2，**只读参考基线，不要直接修改**）。改造方式是从这里**复制代码到工作区根目录再修改**，保持与上游的差异清晰。
-- 工作区根目录当前尚未初始化 git、未放置产品代码；首次开发时先从 `reference/ZCode` 复制 monorepo 骨架（`packages/`、`apps/`、`package.json`、`pnpm-workspace.yaml`、`tsconfig.base.json` 等）到根目录。
-- 每个运营项目内，智能体的状态文件统一放 `.agents/`：每个智能体有自己的子文件夹，存放临时文件与状态文件（agents.md、经验、规则、记忆、进度等）。所有智能体对整个项目有查看/编辑权限。
+- `reference/ZCode/`：ZCode 上游完整源码（v3.17.2，**只读参考基线，不要直接修改**）。根目录的 fork 已从这里复制并完成全量改名（ZCode→RobinRun，包名 `@robinrun/*`，目录 `apps/robinrun-cli`、`packages/robinrun-cua` 等）；根仓库 git remote `upstream` 指向 reference/ZCode，便于与上游对比/合并。
+- 数据根为 `~/.robinrun`（上游是 ~/.zcode），env 前缀 `ROBINRUN_*`；协议 deep link 为 `robinrun://`。上游 CDN/endpoint URL 值（cdn-zcode.z.ai、zcode.z.ai、bigmodel appId 等）**有意保留未改**，见改名提交说明。
+- 每个运营项目内，智能体的状态文件统一放 `.agents/`：每个智能体有自己的子文件夹，存放临时文件与状态文件（agents.md、经验、规则、记忆、进度等）。所有智能体对整个项目有查看/编辑权限。**注意**：渲染端目前没有任意路径写文件的 API，`.agents/` 物理脚手架暂缓，由智能体运行时自建。
+
+## 当前进度（P1 已落地，2026-11）
+
+- 基线可运行：`pnpm install`/`bootstrap`/`typecheck`/`dev:desktop` 全部通过。
+- 项目启动台（launcher）：冷启动必进启动台（`packages/desktop/src/main/startupWorkspace.ts` launcher 模式 + `packages/ui/src/robinrun/RobinRunLauncher.tsx`）；项目注册表持久化在 `robinrunProjects`（settings schema + protocol.ts 有编译期形状守卫）。
+- 智能体侧栏：左侧栏默认"智能体"视图 = 复用任务组（TaskGroup）承载智能体（M1 映射），智能体下折叠会话列表；文案已智能体化（taskGroup.* zh/en）。
+- 未落地（按里程碑推进）：常驻多智能体运行时、触发器、审核流程、任务系统 UI、会议、邮件、后端。
 
 ## 前后端划分
 
@@ -81,13 +88,13 @@ RobinRun 是一个**全自动线上运营（非运维）Harness 系统**，基�
 
 - 触发器/定时：上游 automations（Cron/延时任务）参考 `reference/ZCode/docs/automation-*.md`。
 - 常驻 subagent 运行时：参考 `reference/ZCode/docs/agent-background-subagent-join.md`、`docs/subagent-*.md`（需从"临时"改为"常驻可复用"）。
-- 插件/MCP/Skill：见 `apps/zcode-cli/packages/`（`*-plugin`、`bundled-skills`、`contracts`）。
+- 插件/MCP/Skill：见 `apps/robinrun-cli/packages/`（`*-plugin`、`bundled-skills`、`contracts`）。
 
 ## 上游仓库结构与命令
 
-ZCode 是 pnpm monorepo：`packages/desktop`（Electron main/host/renderer）、`packages/web`+`packages/server`（Web 端）、`packages/ui`（React 组件/hooks/Zustand store）、`packages/services`（业务服务）、`packages/rpc`、`packages/shared`（协议与类型）、`packages/client`、`apps/zcode-cli`（Agent CLI 与运行时，内部含 `core`/`cli`/`bootstrap`/`tui` 等）。
+monorepo 结构（已改名）：`packages/desktop`（Electron main/host/renderer）、`packages/web`+`packages/server`（Web 端）、`packages/ui`（React 组件/hooks/Zustand store）、`packages/services`（业务服务，含 task-groups 项目分组服务）、`packages/rpc`、`packages/shared`（协议与类型）、`packages/client`、`apps/robinrun-cli`（Agent CLI 与运行时）。
 
-代码复制到根目录后，以下命令从仓库根执行（环境：Node 24.14.0 + pnpm 10.33.2，`mise.toml` 为准，可用 `mise exec --` 前缀）：
+以下命令从仓库根执行（Node ≥24 + pnpm 10.33.2）：
 
 | 用途         | 命令                            |
 | ------------ | ------------------------------- |
@@ -100,6 +107,14 @@ ZCode 是 pnpm monorepo：`packages/desktop`（Electron main/host/renderer）、
 | 架构检查     | `pnpm architecture:check --changed` |
 | 工程测试     | `pnpm test:engineering <文件>`  |
 | 提交前检查   | `pnpm verify:pre-push`          |
+
+### Windows 环境坑（本机实测，必读）
+
+- **pnpm 必须直调**：`node "D:/nvm_nodejs/node_modules/pnpm/bin/pnpm.cjs" <args>`。PATH 里的 pnpm shim 会因 Anaconda 的坏 `cygpath` 解析到错误路径。
+- **PATH 引号污染**：shell profile 注入了带引号的 PATH 条目（`"D`…），pnpm 派生的 cmd 会因此找不到 node。每次跑构建前先 `export PATH="$(printf '%s' "$PATH" | tr -d '"')"`。
+- **tar 必须用 bsdtar**：GNU tar 把 `E:/...` 当远程主机。`export PATH="/c/Windows/System32:$PATH"` 让 System32 的 bsdtar 优先（prepare-runtime-assets 依赖此）。
+- **grep 不可靠**：PATH 中 Anaconda 的 grep 行为异常；文本处理一律用绝对路径 `D:/Github/Git/usr/bin/grep.exe` 或 `git grep`。
+- commit message 用 ASCII（em-dash 会触发 bash 包装脚本故障）。
 
 ## 架构与编码约定（沿用上游，修改后仍需遵守）
 
