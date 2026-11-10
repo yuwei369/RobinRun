@@ -602,16 +602,11 @@ function RootInner({
           : undefined,
       refreshProviderState,
       readModelSelectionView: readRootModelSelectionView,
-      setLoginEntryOpen: (open) => {
-        setWelcomeScreenOpenReason((currentReason) => {
-          if (open) {
-            return "startup-provider-required";
-          }
-          // JWT 过期提示确认后会先写入 session-expired，随后 provider
-          // 启动门禁以 open=false 收尾。这里若无条件清空，会覆盖重新登录页并回到工作区。
-          // 门禁只能关闭自己拥有的启动登录态，不能清理其它交互来源的 reason。
-          return currentReason === "startup-provider-required" ? null : currentReason;
-        });
+      setLoginEntryOpen: () => {
+        // RobinRun M1：启动登录门禁整体停用——未配置 provider 不再强制登录，
+        // 冷启动直接进项目启动台，LLM 在设置页按需自由配置。
+        // 手动登录入口（provider-request / manual-login / session-expired）不受影响；
+        // 未来 RobinRun 自有账号体系在此接入。
       },
     });
   const isResolvingProviderStartupState = shouldResolveProviderStartupState({
@@ -1163,6 +1158,12 @@ function RootInner({
   });
 
   useEffect(() => {
+    // RobinRun：桌面端冷启动停在项目启动台，不再兜底创建默认 workspace
+    // （conversation workspace 只作为会话库 backing，打开项目时按需处理）。
+    // web 端保留上游兜底行为。
+    if (isDesktop) {
+      return;
+    }
     if (
       shouldBlockRootRender({
         isResolvingStartupAuthState,
